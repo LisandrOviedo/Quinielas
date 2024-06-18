@@ -108,7 +108,12 @@ const cargarEmpleados = async () => {
         });
 
         if (!empleado) {
-          if (empleadoAPI.codigo_tipo_nomina === "N8") {
+          if (
+            empleadoAPI.codigo_tipo_nomina.toUpperCase() === "N8" &&
+            empleadoAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("marinas del lago")
+          ) {
             let empresa_corporativo = await Empresa.findOne({
               where: {
                 nombre: "Corporativo",
@@ -167,6 +172,12 @@ const cargarEmpleados = async () => {
 
               await t.commit();
             }
+          } else if (
+            empleadoAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("aquatic feeds aquafica")
+          ) {
+            continue;
           } else {
             let empresa = await Empresa.findOne({
               where: {
