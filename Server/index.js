@@ -17,7 +17,7 @@ const {
 } = require("./src/controllers/quinielas_controllers.js");
 
 conn
-  .sync({})
+  .sync({ alter: true })
   .then(() => {
     server.listen(PORT, async () => {
       console.log(`Server listening on port ${PORT}`);
