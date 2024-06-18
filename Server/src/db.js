@@ -40,7 +40,6 @@ const {
   Equipo,
   Partido,
   Predicciones,
-  Puntajes,
   Quiniela,
   Resultado_Partido,
   Roles,
@@ -192,24 +191,6 @@ Partido.hasOne(Resultado_Partido, {
   },
 });
 
-// Predicciones 1:1 Puntajes
-Puntajes.belongsTo(Predicciones, {
-  foreignKey: {
-    allowNull: false,
-    name: "prediccion_id",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  },
-});
-Predicciones.hasOne(Puntajes, {
-  foreignKey: {
-    allowNull: false,
-    name: "prediccion_id",
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  },
-});
-
 // Quiniela 1:M Empresa
 Quiniela.hasMany(Empresa, {
   foreignKey: {
@@ -236,7 +217,6 @@ module.exports = {
   Equipo,
   Partido,
   Predicciones,
-  Puntajes,
   Quiniela,
   Resultado_Partido,
   Roles,
