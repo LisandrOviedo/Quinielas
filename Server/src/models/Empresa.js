@@ -7,9 +7,14 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
+    quiniela_id: {
+      // Campo relacionado
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
     codigo_empresa: {
       type: DataTypes.STRING(3),
-      allowNull: false,
+      allowNull: true,
     },
     nombre: {
       type: DataTypes.STRING(80),
@@ -17,11 +22,11 @@ module.exports = (sequelize) => {
     },
     direccion: {
       type: DataTypes.STRING(80),
-      allowNull: false,
+      allowNull: true,
     },
     rif: {
       type: DataTypes.STRING(12),
-      allowNull: false,
+      allowNull: true,
     },
     activo: {
       type: DataTypes.BOOLEAN,

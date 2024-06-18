@@ -41,6 +41,7 @@ const {
   Partido,
   Predicciones,
   Puntajes,
+  Quiniela,
   Resultado_Partido,
   Roles,
   Torneo,
@@ -192,7 +193,7 @@ Partido.hasOne(Resultado_Partido, {
 });
 
 // Predicciones 1:1 Puntajes
-Predicciones.belongsTo(Puntajes, {
+Puntajes.belongsTo(Predicciones, {
   foreignKey: {
     allowNull: false,
     name: "prediccion_id",
@@ -200,10 +201,28 @@ Predicciones.belongsTo(Puntajes, {
     onUpdate: "RESTRICT",
   },
 });
-Puntajes.hasOne(Predicciones, {
+Predicciones.hasOne(Puntajes, {
   foreignKey: {
     allowNull: false,
     name: "prediccion_id",
+    onDelete: "RESTRICT",
+    onUpdate: "RESTRICT",
+  },
+});
+
+// Quiniela 1:M Empresa
+Quiniela.hasMany(Empresa, {
+  foreignKey: {
+    allowNull: false,
+    name: "quiniela_id",
+    onDelete: "RESTRICT",
+    onUpdate: "RESTRICT",
+  },
+});
+Empresa.belongsTo(Quiniela, {
+  foreignKey: {
+    allowNull: false,
+    name: "quiniela_id",
     onDelete: "RESTRICT",
     onUpdate: "RESTRICT",
   },
@@ -218,6 +237,7 @@ module.exports = {
   Partido,
   Predicciones,
   Puntajes,
+  Quiniela,
   Resultado_Partido,
   Roles,
   Torneo,
