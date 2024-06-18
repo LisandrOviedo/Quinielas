@@ -53,16 +53,16 @@ Empleado.belongsTo(Roles, {
   foreignKey: {
     allowNull: false,
     name: "rol_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Roles.hasOne(Empleado, {
   foreignKey: {
     allowNull: false,
     name: "rol_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -71,16 +71,16 @@ Empresa.hasMany(Empleado, {
   foreignKey: {
     allowNull: false,
     name: "empresa_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Empleado.belongsTo(Empresa, {
   foreignKey: {
     allowNull: false,
     name: "empresa_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -89,16 +89,16 @@ Empleado.hasMany(Predicciones, {
   foreignKey: {
     allowNull: false,
     name: "empleado_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Predicciones.belongsTo(Empleado, {
   foreignKey: {
     allowNull: false,
     name: "empleado_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -107,16 +107,16 @@ Torneo.hasMany(Partido, {
   foreignKey: {
     allowNull: false,
     name: "torneo_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Partido.belongsTo(Torneo, {
   foreignKey: {
     allowNull: false,
     name: "torneo_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -125,16 +125,16 @@ Equipo.hasMany(Partido, {
   foreignKey: {
     allowNull: false,
     name: "equipo_a",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Partido.belongsTo(Equipo, {
   foreignKey: {
     allowNull: false,
     name: "equipo_a",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -143,16 +143,16 @@ Equipo.hasMany(Partido, {
   foreignKey: {
     allowNull: false,
     name: "equipo_b",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Partido.belongsTo(Equipo, {
   foreignKey: {
     allowNull: false,
     name: "equipo_b",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -161,16 +161,16 @@ Partido.hasMany(Predicciones, {
   foreignKey: {
     allowNull: false,
     name: "partido_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Predicciones.belongsTo(Partido, {
   foreignKey: {
     allowNull: false,
     name: "partido_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -179,16 +179,16 @@ Resultado_Partido.belongsTo(Partido, {
   foreignKey: {
     allowNull: false,
     name: "partido_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Partido.hasOne(Resultado_Partido, {
   foreignKey: {
     allowNull: false,
     name: "partido_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -197,16 +197,16 @@ Puntajes.belongsTo(Predicciones, {
   foreignKey: {
     allowNull: false,
     name: "prediccion_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Predicciones.hasOne(Puntajes, {
   foreignKey: {
     allowNull: false,
     name: "prediccion_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
@@ -215,16 +215,16 @@ Quiniela.hasMany(Empresa, {
   foreignKey: {
     allowNull: false,
     name: "quiniela_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 Empresa.belongsTo(Quiniela, {
   foreignKey: {
     allowNull: false,
     name: "quiniela_id",
-    onDelete: "RESTRICT",
-    onUpdate: "RESTRICT",
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
   },
 });
 
