@@ -107,31 +107,95 @@ const cargarEmpleados = async () => {
           },
         });
 
-        let empresa = await Empresa.findOne({
-          where: {
-            codigo_empresa: empleadoAPI.codigo_empresa,
-          },
-        });
+        if (!empleado) {
+          if (empleadoAPI.codigo_tipo_nomina === "N8") {
+            let empresa_corporativo = await Empresa.findOne({
+              where: {
+                nombre: "Corporativo",
+              },
+            });
 
-        if (!empleado && empresa) {
-          t = await conn.transaction();
+            if (empresa_corporativo) {
+              t = await conn.transaction();
 
-          await Empleado.create(
-            {
-              rol_id: rolEmpleado.rol_id,
-              empresa_id: empresa.empresa_id,
-              codigo_empleado: empleadoAPI.codigo_empleado,
-              cedula: empleadoAPI.cedula,
-              clave: empleadoAPI.cedula,
-              nombres: ordenarNombresAPI(empleadoAPI.nombres),
-              apellidos: ordenarNombresAPI(empleadoAPI.apellidos),
-              fecha_nacimiento: `${YYYYMMDD(empleadoAPI.fecha_nacimiento)}`,
-              direccion: ordenarDireccionesAPI(empleadoAPI.direccion) || null,
-            },
-            { transaction: t }
-          );
+              await Empleado.create(
+                {
+                  rol_id: rolEmpleado.rol_id,
+                  empresa_id: empresa_corporativo.empresa_id,
+                  codigo_empleado: empleadoAPI.codigo_empleado,
+                  cedula: empleadoAPI.cedula,
+                  clave: empleadoAPI.cedula,
+                  nombres: ordenarNombresAPI(empleadoAPI.nombres),
+                  apellidos: ordenarNombresAPI(empleadoAPI.apellidos),
+                  fecha_nacimiento: `${YYYYMMDD(empleadoAPI.fecha_nacimiento)}`,
+                  direccion:
+                    ordenarDireccionesAPI(empleadoAPI.direccion) || null,
+                },
+                { transaction: t }
+              );
 
-          await t.commit();
+              await t.commit();
+            }
+          } else if (
+            empleadoAPI.codigo_tipo_nomina === "104" ||
+            empleadoAPI.codigo_tipo_nomina === "112"
+          ) {
+            let empresa_byb = await Empresa.findOne({
+              where: {
+                nombre: "BYB",
+              },
+            });
+
+            if (empresa_byb) {
+              t = await conn.transaction();
+
+              await Empleado.create(
+                {
+                  rol_id: rolEmpleado.rol_id,
+                  empresa_id: empresa_byb.empresa_id,
+                  codigo_empleado: empleadoAPI.codigo_empleado,
+                  cedula: empleadoAPI.cedula,
+                  clave: empleadoAPI.cedula,
+                  nombres: ordenarNombresAPI(empleadoAPI.nombres),
+                  apellidos: ordenarNombresAPI(empleadoAPI.apellidos),
+                  fecha_nacimiento: `${YYYYMMDD(empleadoAPI.fecha_nacimiento)}`,
+                  direccion:
+                    ordenarDireccionesAPI(empleadoAPI.direccion) || null,
+                },
+                { transaction: t }
+              );
+
+              await t.commit();
+            }
+          } else {
+            let empresa = await Empresa.findOne({
+              where: {
+                codigo_empresa: empleadoAPI.codigo_empresa,
+              },
+            });
+
+            if (empresa) {
+              t = await conn.transaction();
+
+              await Empleado.create(
+                {
+                  rol_id: rolEmpleado.rol_id,
+                  empresa_id: empresa.empresa_id,
+                  codigo_empleado: empleadoAPI.codigo_empleado,
+                  cedula: empleadoAPI.cedula,
+                  clave: empleadoAPI.cedula,
+                  nombres: ordenarNombresAPI(empleadoAPI.nombres),
+                  apellidos: ordenarNombresAPI(empleadoAPI.apellidos),
+                  fecha_nacimiento: `${YYYYMMDD(empleadoAPI.fecha_nacimiento)}`,
+                  direccion:
+                    ordenarDireccionesAPI(empleadoAPI.direccion) || null,
+                },
+                { transaction: t }
+              );
+
+              await t.commit();
+            }
+          }
         }
       }
     }
