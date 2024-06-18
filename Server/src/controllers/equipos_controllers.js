@@ -10,9 +10,10 @@ const cargarEquipos = async () => {
       t = await conn.transaction();
 
       const [crearEquipo, created] = await Equipo.findOrCreate({
-        where: { nombre: equipo },
+        where: { nombre: equipo.nombre },
         defaults: {
-          nombre: equipo,
+          nombre: equipo.nombre,
+          ruta_imagen: equipo.ruta_imagen,
         },
         transaction: t,
       });
