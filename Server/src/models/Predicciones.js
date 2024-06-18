@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
       autoIncrement: true,
       primaryKey: true,
     },
-    usuario_id: {
+    empleado_id: {
       // Campo relacionado
       type: DataTypes.INTEGER,
       allowNull: false,
