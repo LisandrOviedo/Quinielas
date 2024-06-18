@@ -34,7 +34,6 @@ const cargarPartidos = async () => {
           numero_jornada: partido.numero_jornada,
           equipo_a: equipo_a.equipo_id,
           equipo_b: equipo_b.equipo_id,
-          fecha_hora_partido: partido.fecha_hora_partido,
         },
         defaults: {
           torneo_id: torneo.torneo_id,
@@ -59,5 +58,5 @@ const cargarPartidos = async () => {
 };
 
 module.exports = {
-    cargarPartidos,
+  cargarPartidos,
 };
