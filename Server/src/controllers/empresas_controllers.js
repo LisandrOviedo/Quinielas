@@ -21,117 +21,208 @@ const cargarEmpresas = async () => {
       },
     });
 
-    // const { data } = await axios(API_EMPLEADOS);
+    const { data } = await axios(API_EMPLEADOS);
 
     console.log("hizo la consulta de empresas", new Date());
 
-    // for (const empresaAPI of data) {
-    //   if (empresaAPI.estado_nomina === "Activo") {
-    //     let empresa = await Empresa.findOne({
-    //       where: {
-    //         codigo_empresa: empresaAPI.codigo_empresa,
-    //       },
-    //     });
+    for (const empresaAPI of data) {
+      if (empresaAPI.estado_nomina === "Activo") {
+        let empresa = await Empresa.findOne({
+          where: {
+            codigo_empresa: empresaAPI.codigo_empresa,
+          },
+        });
 
-    //     if (!empresa) {
-    //       let quiniela = null;
+        if (!empresa) {
+          let quiniela = null;
 
-    //       if (
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("balanceado") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("altamar") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("doña clara") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("antartica") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("imdaca") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("harimarca") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("opindulca")
-    //       ) {
-    //         quiniela = "San Francisco";
-    //       } else if (
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("inmarlaca") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("marinas del") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("mayollera") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("agrodirecto") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("atlantico")
-    //       ) {
-    //         quiniela = "La Cañada";
-    //       } else if (
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("aquazul") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("moporo") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("astrea") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("feltrina") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("tomoporo") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("ceuta") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("camelias") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("arapuey") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("don saul") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("aquadoca") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("bogotana")
-    //       ) {
-    //         quiniela = "Sur Del Lago";
-    //       } else if (
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("lamarsa") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("ecolarva") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("faraven") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("grucasa") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("farallon") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("catabre")
-    //       ) {
-    //         quiniela = "Falcón";
-    //       } else if (
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("corporativo") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("aduana") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("lcda") ||
-    //         empresaAPI.descripcion_empresa
-    //           .toLowerCase()
-    //           .includes("transalca") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("ING") ||
-    //         empresaAPI.descripcion_empresa.toLowerCase().includes("3030")
-    //       ) {
-    //         quiniela = "Maracaibo";
-    //       }
+          if (
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("balanceado") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("altamar") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("doña clara") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("antartica") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("imdaca") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("harimarca") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("opindulca") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("industria marina de alimentos") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("harinera del mar caribe")
+          ) {
+            quiniela = "San Francisco";
+          } else if (
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("inmarlaca") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("marinas del") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("mayollera") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agrodirecto") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("atlantico") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("centro investigativo marino") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("inversiones marinas") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agropecuaria don ramon") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("inversiones piscicolas la cima") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("ganaderia del lago") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agropecuaria nava serrada") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agricola los claros")
+          ) {
+            quiniela = "La Cañada";
+          } else if (
+            empresaAPI.descripcion_empresa.toLowerCase().includes("aquazul") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("moporo") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("astrea") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("feltrina") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("tomoporo") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("ceuta") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("camelias") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("arapuey") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("don saul") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("aquadoca") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("bogotana") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("camaronera de la costa occidental") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("acuatecnica de venezuela") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("aquacultivos de occidente") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("camaronera costa lago") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("acuicultivo coquivacoa")
+          ) {
+            quiniela = "Sur Del Lago";
+          } else if (
+            empresaAPI.descripcion_empresa.toLowerCase().includes("lamarsa") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("ecolarva") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("faraven") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("grucasa") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("farallon") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("catabre") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("laboratorio marino") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agromarina costa azul") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("laboratorio ocean marine")
+          ) {
+            quiniela = "Falcón";
+          } else if (
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("corporativo") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("aduana") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("lcda") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("transalca") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("ing") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("3030") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("operadora industrial del lago") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("transporte de alimentos") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("la casa del acuicultor") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("inversiones negr") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("distribuidora lago maracaibo") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("los soles restaurant") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("reco reciclajes ecologicos")
+          ) {
+            quiniela = "Maracaibo";
+          } else if (
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agropecuaria makaer") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("palmeras lago maracaibo") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("acuicola puerto caleta") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("aserradero san andres")
+          ) {
+            quiniela = "Machiques";
+          }
 
-    //       let asignar_quiniela = await Quiniela.findOne({
-    //         where: {
-    //           nombre: quiniela,
-    //         },
-    //       });
+          let asignar_quiniela = await Quiniela.findOne({
+            where: {
+              nombre: quiniela,
+            },
+          });
 
-    //       t = await conn.transaction();
+          t = await conn.transaction();
 
-    //       await Empresa.create(
-    //         {
-    //           quiniela_id:
-    //             quiniela !== null ? asignar_quiniela.quiniela_id : null,
-    //           codigo_empresa: empresaAPI.codigo_empresa,
-    //           nombre: ordenarNombresAPI(empresaAPI.descripcion_empresa),
-    //           direccion: ordenarDireccionesAPI(empresaAPI.direccion_empresa),
-    //           rif: empresaAPI.rif_empresa,
-    //         },
-    //         { transaction: t }
-    //       );
+          await Empresa.create(
+            {
+              quiniela_id:
+                quiniela !== null ? asignar_quiniela.quiniela_id : null,
+              codigo_empresa: empresaAPI.codigo_empresa,
+              nombre: ordenarNombresAPI(empresaAPI.descripcion_empresa),
+              direccion: ordenarDireccionesAPI(empresaAPI.direccion_empresa),
+              rif: empresaAPI.rif_empresa,
+            },
+            { transaction: t }
+          );
 
-    //       await t.commit();
-    //     }
-    //   }
-    // }
+          await t.commit();
+        }
+      }
+    }
 
     for (const empresa_faltante of empresas_faltantes) {
       let empresa = await Empresa.findOne({
