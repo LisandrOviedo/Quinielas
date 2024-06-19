@@ -150,7 +150,7 @@ const cargarEmpleadosFaltantes = async () => {
               empresa_id: empresa.empresa_id,
               codigo_empleado: empleado_faltante.codigo_empleado,
               cedula: empleado_faltante.cedula,
-              clave: empleado_faltante.cedula,
+              clave: empleado_faltante.clave,
               nombres: empleado_faltante.nombres,
               apellidos: empleado_faltante.apellidos,
               fecha_nacimiento: empleado_faltante.fecha_nacimiento,
