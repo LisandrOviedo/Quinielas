@@ -23,7 +23,8 @@ const cargarEmpresas = async () => {
       if (
         empresaAPI.descripcion_empresa
           .toLowerCase()
-          .includes("aquatic feeds aquafica")
+          .includes("aquatic feeds aquafica") ||
+        empresaAPI.descripcion_empresa.toLowerCase().includes("pesca atlantico")
       ) {
         continue;
       }
@@ -39,16 +40,49 @@ const cargarEmpresas = async () => {
           let quiniela = null;
 
           if (
+            empresaAPI.descripcion_empresa.toLowerCase().includes("b & b") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("corporativo") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("reco reciclajes ecologicos") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("transporte de alimentos") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("ingenieria") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("distribuidora lago maracaibo") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("los soles restaurant") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("operadora industrial del lago") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("la casa del acuicultor") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("aduana") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("inversiones negr") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
               .includes("balanceado") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("harinera del mar caribe") ||
             empresaAPI.descripcion_empresa.toLowerCase().includes("altamar") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
               .includes("doña clara") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("antartica") ||
+              .includes("transalca") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("lcda") ||
             empresaAPI.descripcion_empresa.toLowerCase().includes("imdaca") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
@@ -58,34 +92,65 @@ const cargarEmpresas = async () => {
               .includes("opindulca") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("industria marina de alimentos") ||
+              .includes("industria marina de alimentos")
+          ) {
+            quiniela = "Maracaibo";
+          } else if (
+            empresaAPI.descripcion_empresa.toLowerCase().includes("lamarsa") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("ecolarva") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("faraven") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("grucasa") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("farallon") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("catabre") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("harinera del mar caribe")
+              .includes("laboratorio marino") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agromarina costa azul") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("laboratorio ocean marine") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agropecuaria makaer") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("palmeras lago maracaibo") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("acuicola puerto caleta") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("aserradero san andres") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("ganaderia del lago") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("agricola los claros") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("inversiones marinas c.a.")
           ) {
-            quiniela = "San Francisco";
+            quiniela = "Falcón - Machiques";
           } else if (
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("inmarlaca") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("marinas del") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("mayollera") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("agrodirecto") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("atlantico") ||
+              .includes("inversiones marinas del lago") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
               .includes("centro investigativo marino") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("inmarlaca")
+          ) {
+            quiniela = "Inmarlaca";
+          } else if (
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("inversiones marinas") ||
+              .includes("procesadora atlantico c.a")
+          ) {
+            quiniela = "Atlántico";
+          } else if (
             empresaAPI.descripcion_empresa
               .toLowerCase()
               .includes("agropecuaria don ramon") ||
@@ -94,15 +159,16 @@ const cargarEmpresas = async () => {
               .includes("inversiones piscicolas la cima") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("ganaderia del lago") ||
+              .includes("agrodirecto") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
               .includes("agropecuaria nava serrada") ||
             empresaAPI.descripcion_empresa
               .toLowerCase()
-              .includes("agricola los claros")
+              .includes("mayollera") ||
+            empresaAPI.descripcion_empresa.toLowerCase().includes("matapalo")
           ) {
-            quiniela = "La Cañada";
+            quiniela = "Occidente";
           } else if (
             empresaAPI.descripcion_empresa.toLowerCase().includes("aquazul") ||
             empresaAPI.descripcion_empresa.toLowerCase().includes("moporo") ||
@@ -133,81 +199,9 @@ const cargarEmpresas = async () => {
           ) {
             quiniela = "Sur Del Lago";
           } else if (
-            empresaAPI.descripcion_empresa.toLowerCase().includes("lamarsa") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("ecolarva") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("faraven") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("grucasa") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("farallon") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("catabre") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("laboratorio marino") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("agromarina costa azul") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("laboratorio ocean marine")
+            empresaAPI.descripcion_empresa.toLowerCase().includes("antartica")
           ) {
-            quiniela = "Falcón";
-          } else if (
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("corporativo") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("aduana") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("lcda") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("transalca") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("ing") ||
-            empresaAPI.descripcion_empresa.toLowerCase().includes("3030") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("operadora industrial del lago") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("transporte de alimentos") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("la casa del acuicultor") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("inversiones negr") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("distribuidora lago maracaibo") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("los soles restaurant") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("reco reciclajes ecologicos")
-          ) {
-            quiniela = "Maracaibo";
-          } else if (
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("agropecuaria makaer") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("palmeras lago maracaibo") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("acuicola puerto caleta") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("aserradero san andres")
-          ) {
-            quiniela = "Machiques";
-          } else if (
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("distribuidora b & b") ||
-            empresaAPI.descripcion_empresa
-              .toLowerCase()
-              .includes("bodegas b & b")
-          ) {
-            quiniela = "Corporativo";
+            quiniela = "Antártica";
           }
 
           let asignar_quiniela = await Quiniela.findOne({
