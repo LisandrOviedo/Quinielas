@@ -24,10 +24,13 @@ conn
       console.log(`Server listening on port ${PORT}`);
 
       // await cargarRoles();
+
       // await cargarQuinielas();
       // await cargarEmpresas();
       // await cargarEmpleados();
+
       // await cargarEmpleadosFaltantes();
+
       // await cargarEquipos();
       // await cargarTorneos();
       // await cargarPartidos();
