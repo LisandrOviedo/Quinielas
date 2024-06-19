@@ -19,7 +19,7 @@ module.exports = (sequelize) => {
     },
     codigo_empleado: {
       type: DataTypes.STRING(50),
-      allowNull: false,
+      allowNull: true,
     },
     cedula: {
       type: DataTypes.STRING(20),
@@ -39,7 +39,7 @@ module.exports = (sequelize) => {
     },
     fecha_nacimiento: {
       type: DataTypes.DATEONLY,
-      allowNull: false,
+      allowNull: true,
     },
     direccion: {
       type: DataTypes.STRING(150),
