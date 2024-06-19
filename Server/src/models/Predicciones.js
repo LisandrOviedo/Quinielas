@@ -19,11 +19,11 @@ module.exports = (sequelize) => {
     },
     goles_equipo_a: {
       type: DataTypes.INTEGER(2),
-      allowNull: false,
+      allowNull: true,
     },
     goles_equipo_b: {
       type: DataTypes.INTEGER(2),
-      allowNull: false,
+      allowNull: true,
     },
     activo: {
       type: DataTypes.BOOLEAN,
