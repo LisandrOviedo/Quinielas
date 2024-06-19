@@ -8,6 +8,7 @@ const { cargarRoles } = require("./src/controllers/roles_controllers.js");
 const { cargarEmpresas } = require("./src/controllers/empresas_controllers.js");
 const {
   cargarEmpleados,
+  cargarEmpleadosFaltantes,
 } = require("./src/controllers/empleados_controllers.js");
 const { cargarEquipos } = require("./src/controllers/equipos_controllers.js");
 const { cargarTorneos } = require("./src/controllers/torneos_controllers.js");
@@ -26,6 +27,7 @@ conn
       // await cargarQuinielas();
       // await cargarEmpresas();
       // await cargarEmpleados();
+      // await cargarEmpleadosFaltantes();
       // await cargarEquipos();
       // await cargarTorneos();
       // await cargarPartidos();

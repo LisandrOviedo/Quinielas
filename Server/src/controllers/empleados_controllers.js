@@ -10,80 +10,7 @@ const {
   ordenarDireccionesAPI,
 } = require("../utils/formatearTexto");
 
-const bcrypt = require("bcrypt");
-
-const traerEmpleado = async (empleado_id) => {
-  if (!empleado_id) {
-    throw new Error("Datos faltantes");
-  }
-
-  try {
-    const empleado = await Empleado.findByPk(empleado_id, {
-      attributes: {
-        exclude: ["rol_id", "clave"],
-      },
-      include: [
-        {
-          model: Roles,
-          attributes: ["nombre", "descripcion"],
-        },
-        {
-          model: Empresa,
-          attributes: ["nombre"],
-        },
-      ],
-    });
-
-    if (!empleado) {
-      throw new Error("No existe ese empleado");
-    }
-
-    return empleado;
-  } catch (error) {
-    throw new Error("Error al traer el empleado: " + error.message);
-  }
-};
-
-const login = async (cedula, clave) => {
-  if (!cedula || !clave) {
-    throw new Error("Datos faltantes");
-  }
-
-  try {
-    const empleado = await Empleado.findOne({
-      attributes: {
-        exclude: ["rol_id"],
-      },
-      where: { cedula: cedula },
-      include: [
-        {
-          model: Roles,
-          attributes: ["rol_id", "nombre"],
-        },
-      ],
-    });
-
-    if (!empleado) {
-      throw new Error("Datos incorrectos");
-    }
-
-    if (!empleado.activo) {
-      throw new Error(
-        "Tienes el acceso restringido, ya que tu usuario se encuentra inactivo"
-      );
-    }
-
-    const claveCoincide = await bcrypt.compare(clave, empleado.clave);
-
-    if (!claveCoincide) {
-      throw new Error("Datos incorrectos");
-    }
-
-    return await traerEmpleado(empleado.empleado_id);
-  } catch (error) {
-    throw new Error("Error al loguear: " + error.message);
-  }
-};
+const { empleados_faltantes } = require("../utils/empleados");
 
 const cargarEmpleados = async () => {
   let t;
@@ -190,8 +117,62 @@ const cargarEmpleados = async () => {
   }
 };
 
+const cargarEmpleadosFaltantes = async () => {
+  let t;
+
+  try {
+    const rolEmpleado = await Roles.findOne({
+      where: {
+        nombre: "empleado",
+      },
+    });
+
+    for (const empleado_faltante of empleados_faltantes) {
+      let empleado = await Empleado.findOne({
+        where: {
+          cedula: empleado_faltante.cedula,
+        },
+      });
+
+      if (!empleado) {
+        let empresa = await Empresa.findOne({
+          where: {
+            nombre: empleado_faltante.empresa,
+          },
+        });
+
+        if (empresa) {
+          t = await conn.transaction();
+
+          await Empleado.create(
+            {
+              rol_id: rolEmpleado.rol_id,
+              empresa_id: empresa.empresa_id,
+              codigo_empleado: empleado_faltante.codigo_empleado,
+              cedula: empleado_faltante.cedula,
+              clave: empleado_faltante.cedula,
+              nombres: empleado_faltante.nombres,
+              apellidos: empleado_faltante.apellidos,
+              fecha_nacimiento: empleado_faltante.fecha_nacimiento,
+              direccion: empleado_faltante.direccion || null,
+            },
+            { transaction: t }
+          );
+
+          await t.commit();
+        }
+      }
+    }
+  } catch (error) {
+    if (t && !t.finished) {
+      await t.rollback();
+    }
+
+    throw new Error("Error al crear los empleados faltantes: " + error.message);
+  }
+};
+
 module.exports = {
-  traerEmpleado,
-  login,
   cargarEmpleados,
+  cargarEmpleadosFaltantes,
 };

@@ -22,7 +22,7 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     cedula: {
-      type: DataTypes.INTEGER(10),
+      type: DataTypes.STRING(20),
       allowNull: false,
     },
     clave: {
