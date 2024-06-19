@@ -15,17 +15,19 @@ const cargarEmpresas = async () => {
   let t;
 
   try {
-    const quiniela_maracaibo = await Quiniela.findOne({
-      where: {
-        nombre: "Maracaibo",
-      },
-    });
-
     const { data } = await axios(API_EMPLEADOS);
 
     console.log("hizo la consulta de empresas", new Date());
 
     for (const empresaAPI of data) {
+      if (
+        empresaAPI.descripcion_empresa
+          .toLowerCase()
+          .includes("aquatic feeds aquafica")
+      ) {
+        continue;
+      }
+
       if (empresaAPI.estado_nomina === "Activo") {
         let empresa = await Empresa.findOne({
           where: {
@@ -197,6 +199,15 @@ const cargarEmpresas = async () => {
               .includes("aserradero san andres")
           ) {
             quiniela = "Machiques";
+          } else if (
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("distribuidora b & b") ||
+            empresaAPI.descripcion_empresa
+              .toLowerCase()
+              .includes("bodegas b & b")
+          ) {
+            quiniela = "Corporativo";
           }
 
           let asignar_quiniela = await Quiniela.findOne({
@@ -232,20 +243,28 @@ const cargarEmpresas = async () => {
       });
 
       if (!empresa) {
-        t = await conn.transaction();
-
-        await Empresa.create(
-          {
-            quiniela_id: quiniela_maracaibo.quiniela_id,
-            codigo_empresa: empresa_faltante.codigo_empresa || null,
-            nombre: empresa_faltante.nombre,
-            direccion: empresa_faltante.direccion_empresa || null,
-            rif: empresa_faltante.rif_empresa || null,
+        const quiniela_faltante = await Quiniela.findOne({
+          where: {
+            nombre: empresa_faltante.quiniela,
           },
-          { transaction: t }
-        );
+        });
 
-        await t.commit();
+        if (quiniela_faltante) {
+          t = await conn.transaction();
+
+          await Empresa.create(
+            {
+              quiniela_id: quiniela_faltante.quiniela_id,
+              codigo_empresa: empresa_faltante.codigo_empresa || null,
+              nombre: empresa_faltante.nombre,
+              direccion: empresa_faltante.direccion_empresa || null,
+              rif: empresa_faltante.rif_empresa || null,
+            },
+            { transaction: t }
+          );
+
+          await t.commit();
+        }
       }
     }
 

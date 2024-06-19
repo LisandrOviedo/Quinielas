@@ -5,6 +5,7 @@ const quinielas = [
   "Maracaibo",
   "San Francisco",
   "Sur Del Lago",
+  "Corporativo",
 ];
 
 module.exports = {

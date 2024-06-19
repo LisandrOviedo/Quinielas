@@ -142,37 +142,6 @@ const cargarEmpleados = async () => {
               await t.commit();
             }
           } else if (
-            empleadoAPI.codigo_tipo_nomina === "104" ||
-            empleadoAPI.codigo_tipo_nomina === "112"
-          ) {
-            let empresa_byb = await Empresa.findOne({
-              where: {
-                nombre: "BYB",
-              },
-            });
-
-            if (empresa_byb) {
-              t = await conn.transaction();
-
-              await Empleado.create(
-                {
-                  rol_id: rolEmpleado.rol_id,
-                  empresa_id: empresa_byb.empresa_id,
-                  codigo_empleado: empleadoAPI.codigo_empleado,
-                  cedula: empleadoAPI.cedula,
-                  clave: empleadoAPI.cedula,
-                  nombres: ordenarNombresAPI(empleadoAPI.nombres),
-                  apellidos: ordenarNombresAPI(empleadoAPI.apellidos),
-                  fecha_nacimiento: `${YYYYMMDD(empleadoAPI.fecha_nacimiento)}`,
-                  direccion:
-                    ordenarDireccionesAPI(empleadoAPI.direccion) || null,
-                },
-                { transaction: t }
-              );
-
-              await t.commit();
-            }
-          } else if (
             empleadoAPI.descripcion_empresa
               .toLowerCase()
               .includes("aquatic feeds aquafica")

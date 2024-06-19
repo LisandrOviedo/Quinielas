@@ -1,8 +1,8 @@
 const empresas_faltantes = [
   {
+    quiniela: "Corporativo",
     nombre: "Corporativo",
   },
-  { nombre: "BYB" },
 ];
 
 module.exports = {
