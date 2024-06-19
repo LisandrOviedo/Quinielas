@@ -6,7 +6,7 @@ const textoCapitalizado = (string) => {
 
 const ordenarNombresAPI = (string) => {
   // Expresión regular para eliminar todo lo que no sean espacios en blanco, letras sin acento, letras con acento y guiones
-  const regex = /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s-]/g;
+  const regex = /[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s-&0-9.]/g;
 
   // Reemplazar los caracteres que no cumplan con la expresión regular por una cadena vacía
   let sanitizedStr = string.replace(regex, "").trim();
