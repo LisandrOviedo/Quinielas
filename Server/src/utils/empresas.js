@@ -1,6 +1,6 @@
 const empresas_faltantes = [
   {
-    quiniela: "Corporativo",
+    quiniela: "Maracaibo",
     nombre: "Corporativo",
   },
 ];

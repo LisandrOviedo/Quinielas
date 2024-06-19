@@ -1,11 +1,11 @@
 const quinielas = [
-  "Falcón",
-  "La Cañada",
-  "Machiques",
+  "Antártica",
+  "Atlántico",
+  "Falcón - Machiques",
+  "Inmarlaca",
   "Maracaibo",
-  "San Francisco",
+  "Occidente",
   "Sur Del Lago",
-  "Corporativo",
 ];
 
 module.exports = {
