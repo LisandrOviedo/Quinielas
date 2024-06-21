@@ -1,6 +1,13 @@
 const axios = require("axios");
 
-const { conn, Empleado, Roles, Empresa } = require("../db");
+const {
+  conn,
+  Empleado,
+  Roles,
+  Empresa,
+  Predicciones,
+  Partido,
+} = require("../db");
 
 const { API_EMPLEADOS } = process.env;
 
@@ -171,7 +178,169 @@ const cargarEmpleadosFaltantes = async () => {
   }
 };
 
+const prediccion1y2 = async () => {
+  let t;
+
+  try {
+    const empleados = await Empleado.findAll({
+      attributes: ["empleado_id"],
+    });
+
+    const partidos = await Partido.findAll({
+      attributes: ["partido_id"],
+    });
+
+    console.log("inició el proceso", new Date());
+
+    for (const empleado of empleados) {
+      let prediccion = await Predicciones.findOne({
+        attributes: [
+          "prediccion_id",
+          "empleado_id",
+          "partido_id",
+          "goles_equipo_a",
+          "goles_equipo_b",
+        ],
+        where: {
+          empleado_id: empleado.empleado_id,
+          partido_id: 1,
+        },
+      });
+
+      let prediccion2 = await Predicciones.findOne({
+        attributes: [
+          "prediccion_id",
+          "empleado_id",
+          "partido_id",
+          "goles_equipo_a",
+          "goles_equipo_b",
+        ],
+        where: {
+          empleado_id: empleado.empleado_id,
+          partido_id: 2,
+        },
+      });
+
+      if (!prediccion) {
+        for (const partido of partidos) {
+          if (partido.partido_id === 1) {
+            t = await conn.transaction();
+
+            await Predicciones.findOrCreate({
+              where: {
+                empleado_id: empleado.empleado_id,
+                partido_id: partido.partido_id,
+              },
+              defaults: {
+                empleado_id: empleado.empleado_id,
+                partido_id: partido.partido_id,
+                goles_equipo_a: 2,
+                goles_equipo_b: 0,
+              },
+              transaction: t,
+            });
+
+            await t.commit();
+          } else if (partido.partido_id === 2) {
+            t = await conn.transaction();
+
+            await Predicciones.findOrCreate({
+              where: {
+                empleado_id: empleado.empleado_id,
+                partido_id: partido.partido_id,
+              },
+              defaults: {
+                empleado_id: empleado.empleado_id,
+                partido_id: partido.partido_id,
+                goles_equipo_a: 0,
+                goles_equipo_b: 1,
+              },
+              transaction: t,
+            });
+
+            await t.commit();
+          } else {
+            t = await conn.transaction();
+
+            await Predicciones.findOrCreate({
+              where: {
+                empleado_id: empleado.empleado_id,
+                partido_id: partido.partido_id,
+              },
+              defaults: {
+                empleado_id: empleado.empleado_id,
+                partido_id: partido.partido_id,
+              },
+              transaction: t,
+            });
+
+            await t.commit();
+          }
+        }
+
+        console.log("se crearon las predicciones de", empleado.cedula);
+      } else {
+        if (
+          prediccion.goles_equipo_a === null ||
+          prediccion.goles_equipo_b === null
+        ) {
+          t = await conn.transaction();
+
+          await Predicciones.update(
+            {
+              goles_equipo_a: 2,
+              goles_equipo_b: 0,
+            },
+            {
+              where: { empleado_id: empleado.empleado_id, partido_id: 1 },
+            },
+            { transaction: t }
+          );
+
+          await t.commit();
+
+          console.log("se actualizó el partido 1 de", empleado.cedula);
+        }
+
+        if (
+          prediccion2 &&
+          (prediccion2.goles_equipo_a === null ||
+            prediccion2.goles_equipo_b === null)
+        ) {
+          t = await conn.transaction();
+
+          await Predicciones.update(
+            {
+              goles_equipo_a: 0,
+              goles_equipo_b: 1,
+            },
+            {
+              where: { empleado_id: empleado.empleado_id, partido_id: 2 },
+            },
+            { transaction: t }
+          );
+
+          await t.commit();
+
+          console.log("se actualizó el partido 2 de", empleado.cedula);
+        }
+      }
+    }
+
+    console.log("ya terminó el proceso", new Date());
+  } catch (error) {
+    if (t && !t.finished) {
+      await t.rollback();
+    }
+
+    throw new Error(
+      "Error al actualizar la predicción 1 y/o 2: " + error.message
+    );
+  }
+};
+
 module.exports = {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
+  prediccion1y2,
 };
