@@ -10,7 +10,7 @@ const {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
   prediccion1y2,
-  cargarEmpleadosExcelAntartica,
+  cargarEmpleadosExcel,
 } = require("./src/controllers/empleados_controllers.js");
 const { cargarEquipos } = require("./src/controllers/equipos_controllers.js");
 const { cargarTorneos } = require("./src/controllers/torneos_controllers.js");
@@ -38,7 +38,7 @@ conn
       // await cargarPartidos();
 
       // await prediccion1y2();
-      // await cargarEmpleadosExcelAntartica();
+      // await cargarEmpleadosExcel();
     });
   })
   .catch((error) => console.error(error));

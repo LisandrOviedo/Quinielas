@@ -255,8 +255,8 @@ const prediccion1y2 = async () => {
               defaults: {
                 empleado_id: empleado.empleado_id,
                 partido_id: partido.partido_id,
-                goles_equipo_a: 0,
-                goles_equipo_b: 1,
+                goles_equipo_a: 1,
+                goles_equipo_b: 2,
               },
               transaction: t,
             });
@@ -314,8 +314,8 @@ const prediccion1y2 = async () => {
 
           await Predicciones.update(
             {
-              goles_equipo_a: 0,
-              goles_equipo_b: 1,
+              goles_equipo_a: 1,
+              goles_equipo_b: 2,
             },
             {
               where: { empleado_id: empleado.empleado_id, partido_id: 2 },
@@ -342,13 +342,13 @@ const prediccion1y2 = async () => {
   }
 };
 
-const cargarEmpleadosExcelAntartica = async () => {
+const cargarEmpleadosExcel = async () => {
   let t;
 
   try {
     const excelPath = path.join(
       __dirname,
-      "../../src/utils/DESCABEZADORES.xlsx"
+      "../../src/utils/PERSONAL-AQUALAGO.xlsx"
     );
 
     const workbook = await XlsxPopulate.fromFileAsync(excelPath);
@@ -357,8 +357,12 @@ const cargarEmpleadosExcelAntartica = async () => {
 
     console.log("inició el proceso", new Date());
 
-    for (let row = 2; row <= 82; row++) {
-      const nombrecompleto = worksheet.cell(`A${row}`).value();
+    let conteo = 0;
+
+    for (let row = 9; row <= 80; row++) {
+      // const nombrecompleto = worksheet.cell(`B${row}`).value();
+      const nombre = worksheet.cell(`C${row}`).value();
+      const apellido = worksheet.cell(`D${row}`).value();
       const cedula = worksheet.cell(`B${row}`).value();
 
       t = await conn.transaction();
@@ -369,23 +373,24 @@ const cargarEmpleadosExcelAntartica = async () => {
         },
         defaults: {
           rol_id: 2,
-          empresa_id: 15,
+          empresa_id: 56,
           cedula: cedula,
           clave: cedula,
-          nombres: ordenarNombresAPI(nombrecompleto),
-          apellidos: "",
+          nombres: ordenarNombresAPI(nombre),
+          apellidos: ordenarNombresAPI(apellido),
         },
         transaction: t,
       });
 
       if (!created) {
-        console.log("no creado:", cedula);
+        console.log("ya existe:", cedula);
+        conteo++;
       }
 
       await t.commit();
     }
 
-    console.log("ya terminó el proceso", new Date());
+    console.log("ya terminó el proceso, ya existentes:", conteo, new Date());
   } catch (error) {
     if (t && !t.finished) {
       await t.rollback();
@@ -399,5 +404,5 @@ module.exports = {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
   prediccion1y2,
-  cargarEmpleadosExcelAntartica,
+  cargarEmpleadosExcel,
 };
