@@ -19,6 +19,9 @@ const {
 
 const { empleados_faltantes } = require("../utils/empleados");
 
+const XlsxPopulate = require("xlsx-populate");
+const path = require("path");
+
 const cargarEmpleados = async () => {
   let t;
 
@@ -339,8 +342,62 @@ const prediccion1y2 = async () => {
   }
 };
 
+const cargarEmpleadosExcelAntartica = async () => {
+  let t;
+
+  try {
+    const excelPath = path.join(
+      __dirname,
+      "../../src/utils/DESCABEZADORES.xlsx"
+    );
+
+    const workbook = await XlsxPopulate.fromFileAsync(excelPath);
+
+    const worksheet = workbook.sheet(0);
+
+    console.log("inició el proceso", new Date());
+
+    for (let row = 2; row <= 82; row++) {
+      const nombrecompleto = worksheet.cell(`A${row}`).value();
+      const cedula = worksheet.cell(`B${row}`).value();
+
+      t = await conn.transaction();
+
+      const [crearEmpleado, created] = await Empleado.findOrCreate({
+        where: {
+          cedula: cedula,
+        },
+        defaults: {
+          rol_id: 2,
+          empresa_id: 15,
+          cedula: cedula,
+          clave: cedula,
+          nombres: ordenarNombresAPI(nombrecompleto),
+          apellidos: "",
+        },
+        transaction: t,
+      });
+
+      if (!created) {
+        console.log("no creado:", cedula);
+      }
+
+      await t.commit();
+    }
+
+    console.log("ya terminó el proceso", new Date());
+  } catch (error) {
+    if (t && !t.finished) {
+      await t.rollback();
+    }
+
+    throw new Error("Error al crear los empleados del excel: " + error.message);
+  }
+};
+
 module.exports = {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
   prediccion1y2,
+  cargarEmpleadosExcelAntartica,
 };
