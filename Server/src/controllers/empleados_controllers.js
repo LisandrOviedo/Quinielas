@@ -183,8 +183,7 @@ const prediccion1y2 = async () => {
 
   try {
     const empleados = await Empleado.findAll({
-      attributes: ["empleado_id"],
-      attributes: ["cedula"],
+      attributes: ["empleado_id", "cedula"],
     });
 
     const partidos = await Partido.findAll({
