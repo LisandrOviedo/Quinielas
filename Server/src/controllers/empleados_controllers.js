@@ -7,6 +7,8 @@ const {
   Empresa,
   Predicciones,
   Partido,
+  Resultado_Partido,
+  Quiniela,
 } = require("../db");
 
 const { API_EMPLEADOS } = process.env;
@@ -16,6 +18,11 @@ const {
   ordenarNombresAPI,
   ordenarDireccionesAPI,
 } = require("../utils/formatearTexto");
+
+const {
+  crearCarpetaSiNoExiste,
+  calcularPuntos,
+} = require("../utils/tablaPosiciones");
 
 const { empleados_faltantes } = require("../utils/empleados");
 
@@ -400,9 +407,233 @@ const cargarEmpleadosExcel = async () => {
   }
 };
 
+const tablaPosicionesClaros = async (ficticios) => {
+  const excelPath = path.join(
+    __dirname,
+    "../../src/utils/Tabla Posiciones Plantilla.xlsx"
+  );
+
+  const destPath = path.join(__dirname, `../../src/utils/reportes`);
+
+  try {
+    const resultado_partido = await Resultado_Partido.findAll();
+
+    if (resultado_partido) {
+      let resultados = [];
+
+      for (const resultado of resultado_partido) {
+        let predicciones = await Predicciones.findAll({
+          where: {
+            partido_id: resultado.partido_id,
+          },
+          include: [
+            {
+              model: Empleado,
+              attributes: [
+                "empleado_id",
+                "cedula",
+                "nombres",
+                "apellidos",
+                "direccion",
+                "codigo_empleado",
+                "activo",
+              ],
+            },
+          ],
+        });
+
+        if (predicciones) {
+          for (const prediccion of predicciones) {
+            if (
+              (!ficticios && prediccion.Empleado.direccion === "04127777777") ||
+              prediccion.Empleado.cedula === "21544607"
+            ) {
+              continue;
+            }
+
+            await calcularPuntos(prediccion, resultado).then((objeto) => {
+              let existe = false;
+
+              for (const empleado of resultados) {
+                if (empleado.usuario_id === objeto.usuario_id) {
+                  empleado.puntaje = empleado.puntaje + objeto.puntaje;
+                  existe = true;
+                  break;
+                }
+              }
+
+              if (existe === false) {
+                resultados.push(objeto);
+              }
+            });
+          }
+        } else {
+          console.log("No hay predicciones para el partido:", partido_id);
+        }
+      }
+
+      resultados.sort((a, b) => b.puntaje - a.puntaje);
+
+      crearCarpetaSiNoExiste(destPath);
+
+      const workbook = await XlsxPopulate.fromFileAsync(excelPath);
+
+      const worksheet = workbook.sheet(0);
+
+      let row = 2;
+
+      for (const resultado of resultados) {
+        worksheet.cell(`A${row}`).value(resultado.usuario_id);
+        worksheet.cell(`B${row}`).value(resultado.nombres);
+        worksheet.cell(`C${row}`).value(resultado.apellidos);
+        worksheet.cell(`D${row}`).value(resultado.puntaje);
+
+        row++;
+      }
+
+      let nombre_reporte = "";
+
+      if (!ficticios) {
+        nombre_reporte = "Tabla Posiciones Claros";
+      } else {
+        nombre_reporte = "Tabla Posiciones Claros (Con Ficticios)";
+      }
+
+      workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
+
+      console.log(`Reporte: "${nombre_reporte}" creado exitosamente!`);
+    } else {
+      console.log("No hay resultados registrados de partidos");
+    }
+  } catch (error) {
+    throw new Error("Error al crear el reporte excel: " + error.message);
+  }
+};
+
+const tablaPosicionesLAMAR = async (quiniela_id) => {
+  if (!quiniela_id) {
+    return console.log("Debes ingresar el quiniela_id");
+  }
+
+  const quiniela = await Quiniela.findOne({
+    where: {
+      quiniela_id: quiniela_id,
+    },
+  });
+
+  if (!quiniela) {
+    return console.log("No existe esa quiniela");
+  }
+
+  const excelPath = path.join(
+    __dirname,
+    "../../src/utils/Tabla Posiciones Plantilla.xlsx"
+  );
+
+  const destPath = path.join(__dirname, `../../src/utils/reportes`);
+
+  try {
+    const resultado_partido = await Resultado_Partido.findAll();
+
+    if (resultado_partido) {
+      let resultados = [];
+
+      for (const resultado of resultado_partido) {
+        let predicciones = await Predicciones.findAll({
+          where: {
+            partido_id: resultado.partido_id,
+          },
+          include: [
+            {
+              model: Empleado,
+              attributes: [
+                "empleado_id",
+                "empresa_id",
+                "cedula",
+                "nombres",
+                "apellidos",
+                "direccion",
+                "codigo_empleado",
+                "activo",
+              ],
+              include: [
+                {
+                  model: Empresa,
+                  attributes: ["empresa_id", "quiniela_id"],
+                  where: { quiniela_id: quiniela_id },
+                  required: true,
+                },
+              ],
+              required: true,
+            },
+          ],
+        });
+
+        if (predicciones) {
+          for (const prediccion of predicciones) {
+            await calcularPuntos(prediccion, resultado).then((objeto) => {
+              let existe = false;
+
+              for (const empleado of resultados) {
+                if (empleado.usuario_id === objeto.usuario_id) {
+                  empleado.puntaje = empleado.puntaje + objeto.puntaje;
+                  existe = true;
+                  break;
+                }
+              }
+
+              if (existe === false) {
+                resultados.push(objeto);
+              }
+            });
+          }
+        } else {
+          console.log(
+            "No hay predicciones para el partido:",
+            resultado.partido_id
+          );
+        }
+      }
+
+      if (resultados.length) {
+        resultados.sort((a, b) => b.puntaje - a.puntaje);
+
+        crearCarpetaSiNoExiste(destPath);
+
+        const workbook = await XlsxPopulate.fromFileAsync(excelPath);
+
+        const worksheet = workbook.sheet(0);
+
+        let row = 2;
+
+        for (const resultado of resultados) {
+          worksheet.cell(`A${row}`).value(resultado.usuario_id);
+          worksheet.cell(`B${row}`).value(resultado.nombres);
+          worksheet.cell(`C${row}`).value(resultado.apellidos);
+          worksheet.cell(`D${row}`).value(resultado.puntaje);
+
+          row++;
+        }
+
+        const nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre})`;
+
+        workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
+
+        console.log(`Reporte: "${nombre_reporte}" creado exitosamente!`);
+      }
+    } else {
+      console.log("No hay resultados registrados de partidos");
+    }
+  } catch (error) {
+    throw new Error("Error al crear el reporte excel: " + error.message);
+  }
+};
+
 module.exports = {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
   prediccion1y2,
   cargarEmpleadosExcel,
+  tablaPosicionesClaros,
+  tablaPosicionesLAMAR,
 };

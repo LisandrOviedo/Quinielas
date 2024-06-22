@@ -11,6 +11,8 @@ const {
   cargarEmpleadosFaltantes,
   prediccion1y2,
   cargarEmpleadosExcel,
+  tablaPosicionesClaros,
+  tablaPosicionesLAMAR,
 } = require("./src/controllers/empleados_controllers.js");
 const { cargarEquipos } = require("./src/controllers/equipos_controllers.js");
 const { cargarTorneos } = require("./src/controllers/torneos_controllers.js");
@@ -37,8 +39,13 @@ conn
       // await cargarTorneos();
       // await cargarPartidos();
 
-      // await prediccion1y2();
       // await cargarEmpleadosExcel();
+
+      // await prediccion1y2();
+
+      // await tablaPosicionesClaros(1);
+
+      // await tablaPosicionesLAMAR(5);
     });
   })
   .catch((error) => console.error(error));
