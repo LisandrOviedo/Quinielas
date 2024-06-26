@@ -494,9 +494,9 @@ const tablaPosicionesClaros = async (ficticios) => {
       let nombre_reporte = "";
 
       if (!ficticios) {
-        nombre_reporte = "Tabla Posiciones Claros";
+        nombre_reporte = "Tabla Posiciones Claros (Sin Ficticios)";
       } else {
-        nombre_reporte = "Tabla Posiciones Claros (Con Ficticios)";
+        nombre_reporte = "Tabla Posiciones Claros";
       }
 
       workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
