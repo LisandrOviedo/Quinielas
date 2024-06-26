@@ -416,7 +416,14 @@ const tablaPosicionesClaros = async (ficticios) => {
   const destPath = path.join(__dirname, `../../src/utils/reportes`);
 
   try {
-    const resultado_partido = await Resultado_Partido.findAll();
+    const resultado_partido = await Partido.findAll({
+      include: [
+        {
+          model: Resultado_Partido,
+          required: true,
+        },
+      ],
+    });
 
     if (resultado_partido) {
       let resultados = [];
@@ -472,7 +479,16 @@ const tablaPosicionesClaros = async (ficticios) => {
         }
       }
 
-      resultados.sort((a, b) => b.puntaje - a.puntaje);
+      resultados.sort((a, b) => {
+        // Comparar primero por el puntaje de manera descendente
+        if (b.puntaje !== a.puntaje) {
+          return b.puntaje - a.puntaje;
+        }
+        // Si el puntaje es igual, comparar por la fecha de manera ascendente
+        else {
+          return a.fecha_prediccion - b.fecha_prediccion;
+        }
+      });
 
       crearCarpetaSiNoExiste(destPath);
 
@@ -533,7 +549,14 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
   const destPath = path.join(__dirname, `../../src/utils/reportes`);
 
   try {
-    const resultado_partido = await Resultado_Partido.findAll();
+    const resultado_partido = await Partido.findAll({
+      include: [
+        {
+          model: Resultado_Partido,
+          required: true,
+        },
+      ],
+    });
 
     if (resultado_partido) {
       let resultados = [];
@@ -596,7 +619,16 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
       }
 
       if (resultados.length) {
-        resultados.sort((a, b) => b.puntaje - a.puntaje);
+        resultados.sort((a, b) => {
+          // Comparar primero por el puntaje de manera descendente
+          if (b.puntaje !== a.puntaje) {
+            return b.puntaje - a.puntaje;
+          }
+          // Si el puntaje es igual, comparar por la fecha de manera ascendente
+          else {
+            return a.fecha_prediccion - b.fecha_prediccion;
+          }
+        });
 
         crearCarpetaSiNoExiste(destPath);
 

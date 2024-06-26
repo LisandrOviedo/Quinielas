@@ -1,4 +1,4 @@
-const { conn, Partido, Torneo, Equipo } = require("../db");
+const { conn, Partido, Torneo, Equipo, Resultado_Partido } = require("../db");
 
 const { partidos } = require("../utils/partidos");
 
@@ -57,6 +57,39 @@ const cargarPartidos = async () => {
   }
 };
 
+const cerrarPartidos = async () => {
+  const partidos_activos = await Partido.findAll({
+    where: {
+      activo: 1,
+    },
+  });
+
+  const fecha_actual = new Date();
+
+  console.log("fecha_a:", fecha_actual);
+  
+  for (const partido of partidos_activos) {
+    const fecha_hora_partido = new Date(
+      partido.fecha_hora_partido.getTime() + 4 * 60 * 60 * 1000
+    );
+
+    console.log("fecha_b:", fecha_hora_partido);
+
+    const diferencia = Math.abs(fecha_actual - fecha_hora_partido) / 1000; // Diferencia en segundos
+
+    if (fecha_actual >= fecha_hora_partido) {
+      console.log("Debió cerrar antes");
+    } else if (diferencia <= 300) {
+      console.log(
+        "La fecha y hora de la base de datos está dentro de un rango de 5 minutos"
+      );
+    } else {
+      console.log("Falta para cerrarlo");
+    }
+  }
+};
+
 module.exports = {
   cargarPartidos,
+  cerrarPartidos,
 };

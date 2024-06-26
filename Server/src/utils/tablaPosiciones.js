@@ -15,31 +15,50 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
 
   if (
     (prediccion.goles_equipo_a > prediccion.goles_equipo_b &&
-      resultado_partido.goles_equipo_a > resultado_partido.goles_equipo_b) ||
+      resultado_partido.Resultado_Partido.goles_equipo_a >
+        resultado_partido.Resultado_Partido.goles_equipo_b) ||
     (prediccion.goles_equipo_b > prediccion.goles_equipo_a &&
-      resultado_partido.goles_equipo_b > resultado_partido.goles_equipo_a) ||
+      resultado_partido.Resultado_Partido.goles_equipo_b >
+        resultado_partido.Resultado_Partido.goles_equipo_a) ||
     (prediccion.goles_equipo_a === prediccion.goles_equipo_b &&
-      resultado_partido.goles_equipo_a === resultado_partido.goles_equipo_b)
+      resultado_partido.Resultado_Partido.goles_equipo_a ===
+        resultado_partido.Resultado_Partido.goles_equipo_b)
   ) {
     // Si predije ganar un equipo y ganó un equipo ó si predije empate y quedó empate
-    puntos = puntos + 5;
+
+    if (resultado_partido.tipo_partido === "Fase de grupos") {
+      puntos = puntos + 5;
+    } else {
+      puntos = puntos + 10;
+    }
   }
 
   if (
-    prediccion.goles_equipo_a === resultado_partido.goles_equipo_a &&
-    prediccion.goles_equipo_b === resultado_partido.goles_equipo_b
+    prediccion.goles_equipo_a ===
+      resultado_partido.Resultado_Partido.goles_equipo_a &&
+    prediccion.goles_equipo_b ===
+      resultado_partido.Resultado_Partido.goles_equipo_b
   ) {
     // Si acerté los goles de ambos equipos
-    puntos = puntos + 2;
+    if (resultado_partido.tipo_partido === "Fase de grupos") {
+      puntos = puntos + 2;
+    } else {
+      puntos = puntos + 4;
+    }
   }
 
   if (
     Math.abs(prediccion.goles_equipo_a - prediccion.goles_equipo_b) ===
     Math.abs(
-      resultado_partido.goles_equipo_a - resultado_partido.goles_equipo_b
+      resultado_partido.Resultado_Partido.goles_equipo_a -
+        resultado_partido.Resultado_Partido.goles_equipo_b
     )
   ) {
-    puntos = puntos + 1;
+    if (resultado_partido.tipo_partido === "Fase de grupos") {
+      puntos = puntos + 1;
+    } else {
+      puntos = puntos + 2;
+    }
   }
 
   const resultado = {
@@ -47,6 +66,7 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
     nombres: prediccion.Empleado.nombres.trim(),
     apellidos: prediccion.Empleado.apellidos.trim(),
     puntaje: puntos,
+    fecha_prediccion: prediccion.updatedAt,
   };
 
   return resultado;

@@ -16,7 +16,10 @@ const {
 } = require("./src/controllers/empleados_controllers.js");
 const { cargarEquipos } = require("./src/controllers/equipos_controllers.js");
 const { cargarTorneos } = require("./src/controllers/torneos_controllers.js");
-const { cargarPartidos } = require("./src/controllers/partidos_controllers.js");
+const {
+  cargarPartidos,
+  cerrarPartidos,
+} = require("./src/controllers/partidos_controllers.js");
 const {
   cargarQuinielas,
 } = require("./src/controllers/quinielas_controllers.js");
@@ -46,6 +49,8 @@ conn
       // await tablaPosicionesClaros(1);
 
       // await tablaPosicionesLAMAR(5);
+
+      // await cerrarPartidos();
     });
   })
   .catch((error) => console.error(error));
