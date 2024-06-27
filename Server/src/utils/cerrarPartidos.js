@@ -1,6 +1,6 @@
 const { QueryTypes } = require("sequelize");
 
-const cerrarPartido = async (partidos_activos, conexion) => {
+const cerrarPartido = async (partidos_activos, conexion, bd) => {
   let t;
 
   try {
@@ -20,6 +20,8 @@ const cerrarPartido = async (partidos_activos, conexion) => {
         );
 
         if (predicciones_faltantes) {
+          let conteo = 0;
+
           for (const prediccion of predicciones_faltantes) {
             t = await conexion.transaction();
 
@@ -34,8 +36,10 @@ const cerrarPartido = async (partidos_activos, conexion) => {
             await t.commit();
 
             console.log(
-              `Predicción ${prediccion.prediccion_id} actualizada a 0-0`
+              `Predicción ${prediccion.prediccion_id} actualizada a 0-0 (${bd})`
             );
+
+            conteo++;
           }
         }
 
@@ -52,8 +56,12 @@ const cerrarPartido = async (partidos_activos, conexion) => {
         await t.commit();
 
         console.log(
-          `Partido ${partido.partido_id} cerrado, ya que su fecha y hora es:`,
+          `Partido ${partido.partido_id} (${bd}) cerrado, ya que su fecha y hora es:`,
           fecha_hora_partido.toLocaleString()
+        );
+        
+        console.log(
+          `Se actualizaron ${conteo} predicciones del partido ${partido.partido_id} (${bd})`
         );
       }
     }

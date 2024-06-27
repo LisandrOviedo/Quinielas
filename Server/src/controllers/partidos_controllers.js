@@ -93,15 +93,15 @@ const cerrarPartidos = async () => {
     );
 
     if (partidos_activos) {
-      await cerrarPartido(partidos_activos, conn);
+      await cerrarPartido(partidos_activos, conn, "Copa América Claros");
     }
 
     if (partidos_activos2) {
-      await cerrarPartido(partidos_activos2, conn2);
+      await cerrarPartido(partidos_activos2, conn2, "Copa América LAMAR");
     }
 
     if (partidos_activos3) {
-      await cerrarPartido(partidos_activos3, conn3);
+      await cerrarPartido(partidos_activos3, conn3, "EURO Copa Claros");
     }
   } catch (error) {
     throw new Error("Error al cerrar los partidos: " + error.message);
