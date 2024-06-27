@@ -2,9 +2,27 @@ const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
 
-const { DB, USERDB, PASSWORD, HOST, DIALECT, PORT_DB } = process.env;
+const { DB, DB2, DB3, USERDB, PASSWORD, HOST, DIALECT, PORT_DB } = process.env;
 
 const sequelize = new Sequelize(DB, USERDB, PASSWORD, {
+  host: HOST,
+  dialect: DIALECT,
+  port: PORT_DB,
+  logging: false,
+  native: false,
+  timezone: "-04:00",
+});
+
+const sequelize2 = new Sequelize(DB2, USERDB, PASSWORD, {
+  host: HOST,
+  dialect: DIALECT,
+  port: PORT_DB,
+  logging: false,
+  native: false,
+  timezone: "-04:00",
+});
+
+const sequelize3 = new Sequelize(DB3, USERDB, PASSWORD, {
   host: HOST,
   dialect: DIALECT,
   port: PORT_DB,
@@ -213,6 +231,8 @@ Empresa.belongsTo(Quiniela, {
 module.exports = {
   ...sequelize.models, // para poder importar los modelos así: const { Product, User } = require('./db.js');
   conn: sequelize, // para importart la conexión { conn } = require('./db.js');
+  conn2: sequelize2, // para importart la conexión { conn } = require('./db.js');
+  conn3: sequelize3, // para importart la conexión { conn } = require('./db.js');
   Empleado,
   Empresa,
   Equipo,
