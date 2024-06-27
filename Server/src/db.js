@@ -10,6 +10,7 @@ const sequelize = new Sequelize(DB, USERDB, PASSWORD, {
   port: PORT_DB,
   logging: false,
   native: false,
+  timezone: "-04:00",
 });
 
 const basename = path.basename(__filename);
