@@ -1,6 +1,18 @@
-const { conn, Partido, Torneo, Equipo, Predicciones } = require("../db");
+const { QueryTypes } = require("sequelize");
+
+const {
+  conn,
+  conn2,
+  conn3,
+  Partido,
+  Torneo,
+  Equipo,
+  Predicciones,
+} = require("../db");
 
 const { partidos } = require("../utils/partidos");
+
+const { cerrarPartido } = require("../utils/cerrarPartidos");
 
 const cargarPartidos = async () => {
   let t;
@@ -59,49 +71,39 @@ const cargarPartidos = async () => {
 
 const cerrarPartidos = async () => {
   try {
-    const partidos_activos = await Partido.findAll({
-      where: {
-        activo: 1,
-      },
-    });
+    const partidos_activos = await conn.query(
+      "SELECT * FROM partidos WHERE activo = 1",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const partidos_activos2 = await conn2.query(
+      "SELECT * FROM partidos WHERE activo = 1",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    const partidos_activos3 = await conn3.query(
+      "SELECT * FROM partidos WHERE activo = 1",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (partidos_activos) {
-      const fecha_actual = new Date();
+      await cerrarPartido(partidos_activos, conn);
+    }
 
-      let t;
+    if (partidos_activos2) {
+      await cerrarPartido(partidos_activos2, conn2);
+    }
 
-      for (const partido of partidos_activos) {
-        const fecha_hora_partido = partido.fecha_hora_partido;
-
-        const diferencia = Math.abs(fecha_actual - fecha_hora_partido) / 1000; // Diferencia en segundos
-
-        if (fecha_actual >= fecha_hora_partido || diferencia <= 300) {
-          t = await conn.transaction();
-
-          await Partido.update(
-            {
-              activo: 0,
-            },
-            {
-              where: { partido_id: partido.partido_id },
-            },
-            { transaction: t }
-          );
-
-          await t.commit();
-
-          console.log(
-            `Partido ${partido.partido_id} cerrado, ya que su fecha y hora es:`,
-            fecha_hora_partido.toLocaleString()
-          );
-        }
-      }
+    if (partidos_activos3) {
+      await cerrarPartido(partidos_activos3, conn3);
     }
   } catch (error) {
-    if (t && !t.finished) {
-      await t.rollback();
-    }
-
     throw new Error("Error al cerrar los partidos: " + error.message);
   }
 };
