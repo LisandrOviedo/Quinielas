@@ -12,23 +12,6 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
       const diferencia = Math.abs(fecha_actual - fecha_hora_partido) / 1000; // Diferencia en segundos
 
       if (fecha_actual >= fecha_hora_partido || diferencia <= 300) {
-        t = await conexion.transaction();
-
-        const cerrarPartidoBD = await conexion.query(
-          `UPDATE partidos set activo = 0 WHERE partido_id = ${partido.partido_id}`,
-          {
-            t,
-            type: QueryTypes.UPDATE,
-          }
-        );
-
-        await t.commit();
-
-        console.log(
-          `Partido ${partido.partido_id} (${bd}) cerrado, ya que su fecha y hora es:`,
-          fecha_hora_partido.toLocaleString()
-        );
-
         const predicciones_faltantes = await conexion.query(
           `SELECT * FROM predicciones WHERE partido_id = ${partido.partido_id} AND (goles_equipo_a is null OR goles_equipo_b is null)`,
           {
@@ -58,10 +41,26 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
 
             conteo++;
           }
+          console.log(
+            `Se actualizaron ${conteo} predicciones del partido ${partido.partido_id} (${bd})`
+          );
         }
 
+        t = await conexion.transaction();
+
+        const cerrarPartidoBD = await conexion.query(
+          `UPDATE partidos set activo = 0 WHERE partido_id = ${partido.partido_id}`,
+          {
+            t,
+            type: QueryTypes.UPDATE,
+          }
+        );
+
+        await t.commit();
+
         console.log(
-          `Se actualizaron ${conteo} predicciones del partido ${partido.partido_id} (${bd})`
+          `Partido ${partido.partido_id} (${bd}) cerrado, ya que su fecha y hora es:`,
+          fecha_hora_partido.toLocaleString()
         );
       }
     }
