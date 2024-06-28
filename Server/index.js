@@ -50,7 +50,11 @@ conn
 
       // await tablaPosicionesLAMAR(5);
 
-      // await cerrarPartidos();
+      // await cerrarPartidos().then(() => {
+      //   console.log("Terminó el proceso de cerrar partidos");
+
+      //   process.exit(0);
+      // });
     });
   })
   .catch((error) => console.error(error));
