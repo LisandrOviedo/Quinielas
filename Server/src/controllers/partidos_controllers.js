@@ -1,18 +1,8 @@
 const { QueryTypes } = require("sequelize");
 
-const {
-  conn,
-  conn2,
-  conn3,
-  Partido,
-  Torneo,
-  Equipo,
-  Predicciones,
-} = require("../db");
+const { conn2, conn3, conn4, Partido, Torneo, Equipo } = require("../db");
 
 const { partidos } = require("../utils/partidos");
-
-const { cerrarPartido } = require("../utils/cerrarPartidos");
 
 const cargarPartidos = async () => {
   let t;
@@ -71,21 +61,21 @@ const cargarPartidos = async () => {
 
 const cerrarPartidos = async () => {
   try {
-    const partidos_activos = await conn.query(
+    const partidos_activos = await conn2.query(
       "SELECT * FROM partidos WHERE activo = 1",
       {
         type: QueryTypes.SELECT,
       }
     );
 
-    const partidos_activos2 = await conn2.query(
+    const partidos_activos2 = await conn3.query(
       "SELECT * FROM partidos WHERE activo = 1",
       {
         type: QueryTypes.SELECT,
       }
     );
 
-    const partidos_activos3 = await conn3.query(
+    const partidos_activos3 = await conn4.query(
       "SELECT * FROM partidos WHERE activo = 1",
       {
         type: QueryTypes.SELECT,
@@ -93,22 +83,92 @@ const cerrarPartidos = async () => {
     );
 
     if (partidos_activos) {
-      const bd = "Copa América Claros";
-      await cerrarPartido(partidos_activos, conn, bd);
+      const bd = "Copa América LAMAR";
+      await cerrarPartido(partidos_activos, conn2, bd);
     }
 
     if (partidos_activos2) {
-      const bd = "Copa América LAMAR";
+      const bd = "Copa América Claros";
 
-      await cerrarPartido(partidos_activos2, conn2, bd);
+      await cerrarPartido(partidos_activos2, conn3, bd);
     }
 
     if (partidos_activos3) {
       const bd = "EURO Copa Claros";
 
-      await cerrarPartido(partidos_activos3, conn3, bd);
+      await cerrarPartido(partidos_activos3, conn4, bd);
     }
   } catch (error) {
+    throw new Error("Error al cerrar los partidos: " + error.message);
+  }
+};
+
+const cerrarPartido = async (partidos_activos, conexion, bd) => {
+  let t;
+
+  try {
+    const fecha_actual = new Date();
+
+    for (const partido of partidos_activos) {
+      const fecha_hora_partido = partido.fecha_hora_partido;
+
+      const diferencia = Math.abs(fecha_actual - fecha_hora_partido) / 1000; // Diferencia en segundos
+
+      if (fecha_actual >= fecha_hora_partido || diferencia <= 300) {
+        t = await conexion.transaction();
+
+        const cerrarPartidoBD = await conexion.query(
+          `UPDATE partidos set activo = 0 WHERE partido_id = ${partido.partido_id}`,
+          {
+            t,
+            type: QueryTypes.UPDATE,
+          }
+        );
+
+        await t.commit();
+
+        console.log(
+          `Partido ${partido.partido_id} (${bd}) cerrado, inició / inicia:`,
+          fecha_hora_partido.toLocaleString()
+        );
+
+        const predicciones_faltantes = await conexion.query(
+          `SELECT * FROM predicciones WHERE partido_id = ${partido.partido_id} AND (goles_equipo_a is null OR goles_equipo_b is null)`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        );
+
+        if (predicciones_faltantes) {
+          let conteo = 0;
+
+          for (const prediccion of predicciones_faltantes) {
+            t = await conexion.transaction();
+
+            const actualizarPrediccion = await conexion.query(
+              `UPDATE predicciones SET goles_equipo_a = 0, goles_equipo_b = 0 WHERE partido_id = ${partido.partido_id} AND empleado_id = ${prediccion.empleado_id}`,
+              {
+                t,
+                type: QueryTypes.UPDATE,
+              }
+            );
+
+            await t.commit();
+
+            conteo++;
+          }
+
+          console.log(
+            `Se actualizaron ${conteo} predicciones del partido ${partido.partido_id} (${bd})`
+          );
+        }
+      }
+    }
+  } catch (error) {
+    if (t && !t.finished) {
+      await t.rollback();
+    }
+
     throw new Error("Error al cerrar los partidos: " + error.message);
   }
 };
