@@ -135,6 +135,14 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
           }
         );
 
+        const [actualizarPrediccion, metadata] = await conexion.query(
+          `UPDATE predicciones SET goles_equipo_a = 0, goles_equipo_b = 0 WHERE partido_id = ${partido.partido_id} AND (goles_equipo_a is null OR goles_equipo_b is null)`,
+          {
+            t,
+            type: QueryTypes.UPDATE,
+          }
+        );
+
         await t.commit();
 
         console.log(
@@ -144,38 +152,11 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
           fecha_hora_partido.toLocaleString()
         );
 
-        const predicciones_faltantes = await conexion.query(
-          `SELECT * FROM predicciones WHERE partido_id = ${partido.partido_id} AND (goles_equipo_a is null OR goles_equipo_b is null)`,
-          {
-            type: QueryTypes.SELECT,
-          }
+        console.log(
+          `${fechaHoraActual()} - Se actualizaron ${metadata} predicciones del partido ${
+            partido.partido_id
+          } (${bd})`
         );
-
-        if (predicciones_faltantes) {
-          let conteo = 0;
-
-          for (const prediccion of predicciones_faltantes) {
-            t = await conexion.transaction();
-
-            const actualizarPrediccion = await conexion.query(
-              `UPDATE predicciones SET goles_equipo_a = 0, goles_equipo_b = 0 WHERE partido_id = ${partido.partido_id} AND empleado_id = ${prediccion.empleado_id}`,
-              {
-                t,
-                type: QueryTypes.UPDATE,
-              }
-            );
-
-            await t.commit();
-
-            conteo++;
-          }
-
-          console.log(
-            `${fechaHoraActual()} - Se actualizaron ${conteo} predicciones del partido ${
-              partido.partido_id
-            } (${bd})`
-          );
-        }
       }
     }
   } catch (error) {
