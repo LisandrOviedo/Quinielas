@@ -4,6 +4,8 @@ const server = require("./src/server.js");
 const { conn } = require("./src/db.js");
 const PORT = process.env.PORT_SERVER || 3001;
 
+const { fechaHoraActual } = require("./src/utils/formatearFecha.js");
+
 const { cargarRoles } = require("./src/controllers/roles_controllers.js");
 const { cargarEmpresas } = require("./src/controllers/empresas_controllers.js");
 const {
@@ -28,7 +30,7 @@ conn
   .sync()
   .then(() => {
     server.listen(PORT, async () => {
-      console.log(`Server listening on port ${PORT}`);
+      console.log(`${fechaHoraActual()} - Server listening on port ${PORT}`);
 
       // await cargarRoles();
 
@@ -50,11 +52,13 @@ conn
 
       // await tablaPosicionesLAMAR(5);
 
-      // await cerrarPartidos().then(() => {
-      //   console.log("Terminó el proceso de cerrar partidos");
+      await cerrarPartidos().then(() => {
+        console.log(
+          `${fechaHoraActual()} - Terminó el proceso de cerrar partidos`
+        );
 
-      //   process.exit(0);
-      // });
+        process.exit(0);
+      });
     });
   })
   .catch((error) => console.error(error));

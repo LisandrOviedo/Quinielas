@@ -11,13 +11,15 @@ const {
   ordenarDireccionesAPI,
 } = require("../utils/formatearTexto");
 
+const { fechaHoraActual } = require("../utils/formatearFecha");
+
 const cargarEmpresas = async () => {
   let t;
 
   try {
     const { data } = await axios(API_EMPLEADOS);
 
-    console.log("hizo la consulta de empresas", new Date());
+    console.log(`${fechaHoraActual()} - Hizo la consulta de empresas`);
 
     for (const empresaAPI of data) {
       if (
@@ -246,13 +248,16 @@ const cargarEmpresas = async () => {
       }
     }
 
-    console.log("terminó de registrar las empresas", new Date());
+    console.log(`${fechaHoraActual()} - Terminó de registrar las empresas`);
   } catch (error) {
     if (t && !t.finished) {
       await t.rollback();
     }
 
-    throw new Error("Error al crear las empresas: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear las empresas:`,
+      error.message
+    );
   }
 };
 

@@ -2,6 +2,8 @@ const { conn, Torneo } = require("../db");
 
 const { torneos } = require("../utils/torneos");
 
+const { fechaHoraActual } = require("../utils/formatearFecha");
+
 const cargarTorneos = async () => {
   let t;
 
@@ -26,7 +28,10 @@ const cargarTorneos = async () => {
       await t.rollback();
     }
 
-    throw new Error("Error al crear los torneos: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear los torneos:`,
+      error.message
+    );
   }
 };
 

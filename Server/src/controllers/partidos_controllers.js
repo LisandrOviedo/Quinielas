@@ -1,8 +1,10 @@
 const { QueryTypes } = require("sequelize");
 
-const { conn2, conn3, conn4, Partido, Torneo, Equipo } = require("../db");
+const { conn, conn2, conn3, conn4, Partido, Torneo, Equipo } = require("../db");
 
 const { partidos } = require("../utils/partidos");
+
+const { fechaHoraActual } = require("../utils/formatearFecha");
 
 const cargarPartidos = async () => {
   let t;
@@ -55,7 +57,10 @@ const cargarPartidos = async () => {
       await t.rollback();
     }
 
-    throw new Error("Error al crear los partidos: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear los partidos:`,
+      error.message
+    );
   }
 };
 
@@ -99,7 +104,10 @@ const cerrarPartidos = async () => {
       await cerrarPartido(partidos_activos3, conn4, bd);
     }
   } catch (error) {
-    throw new Error("Error al cerrar los partidos: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al cerrar los partidos:`,
+      error.message
+    );
   }
 };
 
@@ -112,7 +120,9 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
     for (const partido of partidos_activos) {
       const fecha_hora_partido = partido.fecha_hora_partido;
 
-      const diferenciaEnMinutos = Math.abs(Math.floor((fecha_actual - fecha_hora_partido) / (1000 * 60)));
+      const diferenciaEnMinutos = Math.abs(
+        Math.floor((fecha_actual - fecha_hora_partido) / (1000 * 60))
+      );
 
       if (fecha_actual >= fecha_hora_partido || diferenciaEnMinutos <= 10) {
         t = await conexion.transaction();
@@ -128,7 +138,9 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
         await t.commit();
 
         console.log(
-          `Partido ${partido.partido_id} (${bd}) cerrado, inició / inicia:`,
+          `${fechaHoraActual()} - Partido ${
+            partido.partido_id
+          } (${bd}) cerrado, fecha y hora de inicio:`,
           fecha_hora_partido.toLocaleString()
         );
 
@@ -159,7 +171,9 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
           }
 
           console.log(
-            `Se actualizaron ${conteo} predicciones del partido ${partido.partido_id} (${bd})`
+            `${fechaHoraActual()} - Se actualizaron ${conteo} predicciones del partido ${
+              partido.partido_id
+            } (${bd})`
           );
         }
       }
@@ -169,7 +183,10 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
       await t.rollback();
     }
 
-    throw new Error("Error al cerrar los partidos: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al cerrar los partidos:`,
+      error.message
+    );
   }
 };
 

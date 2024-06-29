@@ -13,7 +13,7 @@ const {
 
 const { API_EMPLEADOS } = process.env;
 
-const { YYYYMMDD } = require("../utils/formatearFecha");
+const { YYYYMMDD, fechaHoraActual } = require("../utils/formatearFecha");
 const {
   ordenarNombresAPI,
   ordenarDireccionesAPI,
@@ -41,7 +41,7 @@ const cargarEmpleados = async () => {
 
     const { data } = await axios(API_EMPLEADOS);
 
-    console.log("hizo la consulta de empleados", new Date());
+    console.log(`${fechaHoraActual()} - Hizo la consulta de empleados`);
 
     for (const empleadoAPI of data) {
       let empleado = await Empleado.findOne({
@@ -123,13 +123,16 @@ const cargarEmpleados = async () => {
       }
     }
 
-    console.log("terminó de registrar los empleados", new Date());
+    console.log(`${fechaHoraActual()} - Terminó de registrar los empleados`);
   } catch (error) {
     if (t && !t.finished) {
       await t.rollback();
     }
 
-    throw new Error("Error al crear los empleados: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear los empleados:`,
+      error.message
+    );
   }
 };
 
@@ -184,7 +187,10 @@ const cargarEmpleadosFaltantes = async () => {
       await t.rollback();
     }
 
-    throw new Error("Error al crear los empleados faltantes: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear los empleados faltantes:`,
+      error.message
+    );
   }
 };
 
@@ -200,7 +206,7 @@ const prediccion1y2 = async () => {
       attributes: ["partido_id"],
     });
 
-    console.log("inició el proceso", new Date());
+    console.log(`${fechaHoraActual()} - Inició el proceso`);
 
     for (const empleado of empleados) {
       let prediccion = await Predicciones.findOne({
@@ -288,7 +294,10 @@ const prediccion1y2 = async () => {
           }
         }
 
-        console.log("se crearon las predicciones de", empleado.cedula);
+        console.log(
+          `${fechaHoraActual()} - Se crearon las predicciones de`,
+          empleado.cedula
+        );
       } else {
         if (
           prediccion.goles_equipo_a === null ||
@@ -309,7 +318,10 @@ const prediccion1y2 = async () => {
 
           await t.commit();
 
-          console.log("se actualizó el partido 1 de", empleado.cedula);
+          console.log(
+            `${fechaHoraActual()} - Se actualizó el partido 1 de`,
+            empleado.cedula
+          );
         }
 
         if (
@@ -332,19 +344,23 @@ const prediccion1y2 = async () => {
 
           await t.commit();
 
-          console.log("se actualizó el partido 2 de", empleado.cedula);
+          console.log(
+            `${fechaHoraActual()} - Se actualizó el partido 2 de`,
+            empleado.cedula
+          );
         }
       }
     }
 
-    console.log("ya terminó el proceso", new Date());
+    console.log(`${fechaHoraActual()} - Ya terminó el proceso`);
   } catch (error) {
     if (t && !t.finished) {
       await t.rollback();
     }
 
     throw new Error(
-      "Error al actualizar la predicción 1 y/o 2: " + error.message
+      `${fechaHoraActual()} - Error al actualizar la predicción 1 y/o 2:`,
+      error.message
     );
   }
 };
@@ -362,7 +378,7 @@ const cargarEmpleadosExcel = async () => {
 
     const worksheet = workbook.sheet(0);
 
-    console.log("inició el proceso", new Date());
+    console.log(`${fechaHoraActual()} - Inició el proceso`);
 
     let conteo = 0;
 
@@ -390,20 +406,26 @@ const cargarEmpleadosExcel = async () => {
       });
 
       if (!created) {
-        console.log("ya existe:", cedula);
+        console.log(`${fechaHoraActual()} - Ya existe:`, cedula);
         conteo++;
       }
 
       await t.commit();
     }
 
-    console.log("ya terminó el proceso, ya existentes:", conteo, new Date());
+    console.log(
+      `${fechaHoraActual()} - Ya terminó el proceso, ya existentes:`,
+      conteo
+    );
   } catch (error) {
     if (t && !t.finished) {
       await t.rollback();
     }
 
-    throw new Error("Error al crear los empleados del excel: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear los empleados del excel:`,
+      error.message
+    );
   }
 };
 
@@ -475,7 +497,10 @@ const tablaPosicionesClaros = async (ficticios) => {
             });
           }
         } else {
-          console.log("No hay predicciones para el partido:", partido_id);
+          console.log(
+            `${fechaHoraActual()} - No hay predicciones para el partido:`,
+            partido_id
+          );
         }
       }
 
@@ -517,18 +542,25 @@ const tablaPosicionesClaros = async (ficticios) => {
 
       workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
 
-      console.log(`Reporte: "${nombre_reporte}" creado exitosamente!`);
+      console.log(
+        `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
+      );
     } else {
-      console.log("No hay resultados registrados de partidos");
+      console.log(
+        `${fechaHoraActual()} - No hay resultados registrados de partidos`
+      );
     }
   } catch (error) {
-    throw new Error("Error al crear el reporte excel: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear el reporte excel:`,
+      error.message
+    );
   }
 };
 
 const tablaPosicionesLAMAR = async (quiniela_id) => {
   if (!quiniela_id) {
-    return console.log("Debes ingresar el quiniela_id");
+    return console.log(`${fechaHoraActual()} - Debes ingresar el quiniela_id`);
   }
 
   const quiniela = await Quiniela.findOne({
@@ -538,7 +570,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
   });
 
   if (!quiniela) {
-    return console.log("No existe esa quiniela");
+    return console.log(`${fechaHoraActual()} - No existe esa quiniela`);
   }
 
   const excelPath = path.join(
@@ -612,7 +644,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
           }
         } else {
           console.log(
-            "No hay predicciones para el partido:",
+            `${fechaHoraActual()} - No hay predicciones para el partido:`,
             resultado.partido_id
           );
         }
@@ -651,13 +683,20 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
 
         workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
 
-        console.log(`Reporte: "${nombre_reporte}" creado exitosamente!`);
+        console.log(
+          `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
+        );
       }
     } else {
-      console.log("No hay resultados registrados de partidos");
+      console.log(
+        `${fechaHoraActual()} - No hay resultados registrados de partidos`
+      );
     }
   } catch (error) {
-    throw new Error("Error al crear el reporte excel: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear el reporte excel:`,
+      error.message
+    );
   }
 };
 

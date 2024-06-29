@@ -46,9 +46,14 @@ const calcularEdad = (edad) => {
   return age;
 };
 
+const fechaHoraActual = () => {
+  return `[${new Date().toLocaleString()}]`;
+};
+
 module.exports = {
   DDMMYYYYHHMM,
   DDMMYYYY,
   YYYYMMDD,
   calcularEdad,
+  fechaHoraActual,
 };

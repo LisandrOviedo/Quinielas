@@ -2,6 +2,8 @@ const { conn, Roles } = require("../db");
 
 const { roles } = require("../utils/roles");
 
+const { fechaHoraActual } = require("../utils/formatearFecha");
+
 const cargarRoles = async () => {
   let t;
 
@@ -25,7 +27,10 @@ const cargarRoles = async () => {
       await t.rollback();
     }
 
-    throw new Error("Error al crear los roles: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear los roles:`,
+      error.message
+    );
   }
 };
 

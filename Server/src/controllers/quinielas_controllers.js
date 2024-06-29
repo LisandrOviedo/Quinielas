@@ -2,6 +2,8 @@ const { conn, Quiniela } = require("../db");
 
 const { quinielas } = require("../utils/quinielas");
 
+const { fechaHoraActual } = require("../utils/formatearFecha");
+
 const cargarQuinielas = async () => {
   let t;
 
@@ -24,7 +26,10 @@ const cargarQuinielas = async () => {
       await t.rollback();
     }
 
-    throw new Error("Error al crear las quinielas: " + error.message);
+    throw new Error(
+      `${fechaHoraActual()} - Error al crear las quinielas:`,
+      error.message
+    );
   }
 };
 
