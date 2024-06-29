@@ -112,9 +112,9 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
     for (const partido of partidos_activos) {
       const fecha_hora_partido = partido.fecha_hora_partido;
 
-      const diferencia = Math.abs(fecha_actual - fecha_hora_partido) / 1000; // Diferencia en segundos
+      const diferenciaEnMinutos = Math.abs(Math.floor((fecha_actual - fecha_hora_partido) / (1000 * 60)));
 
-      if (fecha_actual >= fecha_hora_partido || diferencia <= 300) {
+      if (fecha_actual >= fecha_hora_partido || diferenciaEnMinutos <= 10) {
         t = await conexion.transaction();
 
         const cerrarPartidoBD = await conexion.query(
