@@ -1,5 +1,9 @@
 const equipos = [
   {
+    nombre: "Por definirse",
+    ruta_imagen: "img/PorDefinirse.svg",
+  },
+  {
     nombre: "Argentina",
     ruta_imagen: "img/Argentina.svg",
   },
