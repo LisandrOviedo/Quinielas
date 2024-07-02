@@ -28,8 +28,7 @@ const cargarRoles = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al crear los roles:`,
-      error.message
+      `Error al crear los roles: ${error.message}`
     );
   }
 };

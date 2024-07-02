@@ -27,8 +27,7 @@ const cargarQuinielas = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al crear las quinielas:`,
-      error.message
+      `Error al crear las quinielas: ${error.message}`
     );
   }
 };

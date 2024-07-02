@@ -58,8 +58,7 @@ const cargarPartidos = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al crear los partidos:`,
-      error.message
+      `Error al crear los partidos: ${error.message}`
     );
   }
 };
@@ -105,8 +104,7 @@ const cerrarPartidos = async () => {
     }
   } catch (error) {
     throw new Error(
-      `${fechaHoraActual()} - Error al cerrar los partidos:`,
-      error.message
+      `Error al cerrar los partidos: ${error.message}`
     );
   }
 };
@@ -165,8 +163,7 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al cerrar los partidos:`,
-      error.message
+      `Error al cerrar los partidos: ${error.message}`
     );
   }
 };

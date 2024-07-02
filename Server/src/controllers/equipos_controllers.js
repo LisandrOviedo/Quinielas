@@ -28,8 +28,7 @@ const cargarEquipos = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al crear los equipos:`,
-      error.message
+      `Error al crear los equipos: ${error.message}`
     );
   }
 };

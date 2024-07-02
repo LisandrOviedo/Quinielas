@@ -255,8 +255,7 @@ const cargarEmpresas = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al crear las empresas:`,
-      error.message
+      `Error al crear las empresas: ${error.message}`
     );
   }
 };

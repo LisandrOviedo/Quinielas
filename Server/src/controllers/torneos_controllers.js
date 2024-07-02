@@ -29,8 +29,7 @@ const cargarTorneos = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al crear los torneos:`,
-      error.message
+      `Error al crear los torneos: ${error.message}`
     );
   }
 };

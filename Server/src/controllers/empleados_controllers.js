@@ -129,10 +129,7 @@ const cargarEmpleados = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `${fechaHoraActual()} - Error al crear los empleados:`,
-      error.message
-    );
+    throw new Error(`Error al crear los empleados: ${error.message}`);
   }
 };
 
@@ -187,10 +184,7 @@ const cargarEmpleadosFaltantes = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `${fechaHoraActual()} - Error al crear los empleados faltantes:`,
-      error.message
-    );
+    throw new Error(`Error al crear los empleados faltantes: ${error.message}`);
   }
 };
 
@@ -359,8 +353,7 @@ const prediccion1y2 = async () => {
     }
 
     throw new Error(
-      `${fechaHoraActual()} - Error al actualizar la predicción 1 y/o 2:`,
-      error.message
+      `Error al actualizar la predicción 1 y/o 2: ${error.message}`
     );
   }
 };
@@ -422,10 +415,7 @@ const cargarEmpleadosExcel = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `${fechaHoraActual()} - Error al crear los empleados del excel:`,
-      error.message
-    );
+    throw new Error(`Error al crear los empleados del excel: ${error.message}`);
   }
 };
 
@@ -551,10 +541,7 @@ const tablaPosicionesClaros = async (ficticios) => {
       );
     }
   } catch (error) {
-    throw new Error(
-      `${fechaHoraActual()} - Error al crear el reporte excel:`,
-      error.message
-    );
+    throw new Error(`Error al crear el reporte excel: ${error.message}`);
   }
 };
 
@@ -693,10 +680,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
       );
     }
   } catch (error) {
-    throw new Error(
-      `${fechaHoraActual()} - Error al crear el reporte excel:`,
-      error.message
-    );
+    throw new Error(`Error al crear el reporte excel: ${error.message}`);
   }
 };
 
