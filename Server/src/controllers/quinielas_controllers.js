@@ -26,9 +26,7 @@ const cargarQuinielas = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al crear las quinielas: ${error.message}`
-    );
+    throw new Error(`Error al crear las quinielas: ${error.message}`);
   }
 };
 

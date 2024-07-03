@@ -27,9 +27,7 @@ const cargarRoles = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al crear los roles: ${error.message}`
-    );
+    throw new Error(`Error al crear los roles: ${error.message}`);
   }
 };
 

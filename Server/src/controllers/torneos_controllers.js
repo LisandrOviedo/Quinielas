@@ -28,9 +28,7 @@ const cargarTorneos = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al crear los torneos: ${error.message}`
-    );
+    throw new Error(`Error al crear los torneos: ${error.message}`);
   }
 };
 

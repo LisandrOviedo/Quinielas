@@ -254,9 +254,7 @@ const cargarEmpresas = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al crear las empresas: ${error.message}`
-    );
+    throw new Error(`Error al crear las empresas: ${error.message}`);
   }
 };
 

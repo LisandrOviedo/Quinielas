@@ -27,9 +27,7 @@ const cargarEquipos = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al crear los equipos: ${error.message}`
-    );
+    throw new Error(`Error al crear los equipos: ${error.message}`);
   }
 };
 
