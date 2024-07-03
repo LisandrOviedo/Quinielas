@@ -471,17 +471,16 @@ const tablaPosicionesClaros = async (ficticios) => {
             }
 
             await calcularPuntos(prediccion, resultado).then((objeto) => {
-              let existe = false;
+              const index = resultados.findIndex(
+                (empleado) => empleado.usuario_id === objeto.usuario_id
+              );
 
-              for (const empleado of resultados) {
-                if (empleado.usuario_id === objeto.usuario_id) {
-                  empleado.puntaje = empleado.puntaje + objeto.puntaje;
-                  existe = true;
-                  break;
-                }
-              }
-
-              if (existe === false) {
+              if (index !== -1) {
+                // Actualizar el valor
+                resultados[index].puntaje =
+                  resultados[index].puntaje + objeto.puntaje;
+              } else {
+                // Agregar un nuevo objeto
                 resultados.push(objeto);
               }
             });
@@ -489,7 +488,7 @@ const tablaPosicionesClaros = async (ficticios) => {
         } else {
           console.log(
             `${fechaHoraActual()} - No hay predicciones para el partido:`,
-            partido_id
+            resultado.partido_id
           );
         }
       }
@@ -614,17 +613,16 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
         if (predicciones) {
           for (const prediccion of predicciones) {
             await calcularPuntos(prediccion, resultado).then((objeto) => {
-              let existe = false;
+              const index = resultados.findIndex(
+                (empleado) => empleado.usuario_id === objeto.usuario_id
+              );
 
-              for (const empleado of resultados) {
-                if (empleado.usuario_id === objeto.usuario_id) {
-                  empleado.puntaje = empleado.puntaje + objeto.puntaje;
-                  existe = true;
-                  break;
-                }
-              }
-
-              if (existe === false) {
+              if (index !== -1) {
+                // Actualizar el valor
+                resultados[index].puntaje =
+                  resultados[index].puntaje + objeto.puntaje;
+              } else {
+                // Agregar un nuevo objeto
                 resultados.push(objeto);
               }
             });
