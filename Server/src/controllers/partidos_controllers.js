@@ -174,6 +174,8 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
 };
 
 const prediccionesFaltantes = async (partido_id_participado) => {
+  let t;
+
   try {
     const partidosConPrediccionesFaltantes = await Partido.findAll({
       where: {
@@ -202,6 +204,8 @@ const prediccionesFaltantes = async (partido_id_participado) => {
           });
 
           if (!prediccion_faltante) {
+            t = await conn.transaction();
+
             const [prediccionFaltante, created] =
               await Predicciones.findOrCreate({
                 where: {
@@ -212,11 +216,14 @@ const prediccionesFaltantes = async (partido_id_participado) => {
                   empleado_id: prediccion.empleado_id,
                   partido_id: partido.partido_id,
                 },
+                transaction: t,
               });
 
             if (created) {
               predicciones_creadas++;
             }
+
+            await t.commit();
           }
         }
 
@@ -227,6 +234,9 @@ const prediccionesFaltantes = async (partido_id_participado) => {
         );
       }
     }
+    console.log(
+      `${fechaHoraActual()} - Finalizó el proceso de predicciones faltantes`
+    );
   } catch (error) {
     if (t && !t.finished) {
       await t.rollback();
