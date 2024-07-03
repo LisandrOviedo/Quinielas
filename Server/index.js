@@ -21,6 +21,7 @@ const { cargarTorneos } = require("./src/controllers/torneos_controllers.js");
 const {
   cargarPartidos,
   cerrarPartidos,
+  prediccionesFaltantes,
 } = require("./src/controllers/partidos_controllers.js");
 const {
   cargarQuinielas,
@@ -51,6 +52,8 @@ conn
       // await tablaPosicionesClaros(1);
 
       // await tablaPosicionesLAMAR(5);
+
+      // await prediccionesFaltantes(24);
 
       await cerrarPartidos().then(() => {
         console.log(

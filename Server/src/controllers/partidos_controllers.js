@@ -1,6 +1,17 @@
-const { QueryTypes } = require("sequelize");
+const { QueryTypes, Model } = require("sequelize");
 
-const { conn, conn2, conn3, conn4, Partido, Torneo, Equipo } = require("../db");
+const { Op } = require("sequelize");
+
+const {
+  conn,
+  conn2,
+  conn3,
+  conn4,
+  Partido,
+  Torneo,
+  Equipo,
+  Predicciones,
+} = require("../db");
 
 const { partidos } = require("../utils/partidos");
 
@@ -57,9 +68,7 @@ const cargarPartidos = async () => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al crear los partidos: ${error.message}`
-    );
+    throw new Error(`Error al crear los partidos: ${error.message}`);
   }
 };
 
@@ -103,9 +112,7 @@ const cerrarPartidos = async () => {
       await cerrarPartido(partidos_activos3, conn4, bd);
     }
   } catch (error) {
-    throw new Error(
-      `Error al cerrar los partidos: ${error.message}`
-    );
+    throw new Error(`Error al cerrar los partidos: ${error.message}`);
   }
 };
 
@@ -162,13 +169,75 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
       await t.rollback();
     }
 
-    throw new Error(
-      `Error al cerrar los partidos: ${error.message}`
-    );
+    throw new Error(`Error al cerrar los partidos: ${error.message}`);
+  }
+};
+
+const prediccionesFaltantes = async (partido_id_participado) => {
+  try {
+    const partidosConPrediccionesFaltantes = await Partido.findAll({
+      where: {
+        tipo_partido: {
+          [Op.ne]: "Fase de grupos",
+        },
+      },
+    });
+
+    const predicciones = await Predicciones.findAll({
+      where: {
+        partido_id: partido_id_participado,
+      },
+    });
+
+    if (partidosConPrediccionesFaltantes && predicciones) {
+      for (const prediccion of predicciones) {
+        let predicciones_creadas = 0;
+
+        for (const partido of partidosConPrediccionesFaltantes) {
+          const prediccion_faltante = await Predicciones.findOne({
+            where: {
+              empleado_id: prediccion.empleado_id,
+              partido_id: partido.partido_id,
+            },
+          });
+
+          if (!prediccion_faltante) {
+            const [prediccionFaltante, created] =
+              await Predicciones.findOrCreate({
+                where: {
+                  empleado_id: prediccion.empleado_id,
+                  partido_id: partido.partido_id,
+                },
+                defaults: {
+                  empleado_id: prediccion.empleado_id,
+                  partido_id: partido.partido_id,
+                },
+              });
+
+            if (created) {
+              predicciones_creadas++;
+            }
+          }
+        }
+
+        console.log(
+          `${fechaHoraActual()} - Se crearon ${predicciones_creadas} predicciones para el empleado ID: ${
+            prediccion.empleado_id
+          }`
+        );
+      }
+    }
+  } catch (error) {
+    if (t && !t.finished) {
+      await t.rollback();
+    }
+
+    throw new Error(`Error al crear predicciones faltantes: ${error.message}`);
   }
 };
 
 module.exports = {
   cargarPartidos,
   cerrarPartidos,
+  prediccionesFaltantes,
 };
