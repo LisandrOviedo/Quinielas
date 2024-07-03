@@ -53,11 +53,9 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
   }
 
   if (
-    Math.abs(prediccion.goles_equipo_a - prediccion.goles_equipo_b) ===
-    Math.abs(
-      resultado_partido.Resultado_Partido.goles_equipo_a -
-        resultado_partido.Resultado_Partido.goles_equipo_b
-    )
+    prediccion.goles_equipo_a - prediccion.goles_equipo_b ===
+    resultado_partido.Resultado_Partido.goles_equipo_a -
+      resultado_partido.Resultado_Partido.goles_equipo_b
   ) {
     if (resultado_partido.tipo_partido === "Fase de grupos") {
       puntos = puntos + 1;
