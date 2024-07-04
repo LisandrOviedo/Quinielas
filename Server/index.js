@@ -1,7 +1,21 @@
+/**
+ * Archivo index.js
+ * @module index
+ */
+
 require("dotenv").config();
 
+/**
+ * Instancia del servidor
+ */
 const server = require("./src/server.js");
+
 const { conn } = require("./src/db.js");
+
+/**
+ * Puerto que usará el servidor al iniciar
+ * @type {(string|number)}
+ */
 const PORT = process.env.PORT_SERVER || 3001;
 
 const { fechaHoraActual } = require("./src/utils/formatearFecha.js");
