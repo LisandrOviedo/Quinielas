@@ -1,9 +1,15 @@
+/**
+ * <b>Funciones relacionadas a los torneos</b>
+ * @module "src/controllers/torneos_controllers.js"
+ */
+
 const { conn, Torneo } = require("../db");
 
 const { torneos } = require("../utils/torneos");
 
-const { fechaHoraActual } = require("../utils/formatearFecha");
-
+/**
+ * <b>Función para cargar los torneos desde un arreglo</b>
+ */
 const cargarTorneos = async () => {
   let t;
 
@@ -24,6 +30,7 @@ const cargarTorneos = async () => {
       await t.commit();
     }
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }

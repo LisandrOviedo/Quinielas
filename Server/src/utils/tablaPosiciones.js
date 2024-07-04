@@ -25,7 +25,7 @@ const crearCarpetaSiNoExiste = (folderPath) => {
 };
 
 /**
- * <b>Función que recibe una "prediccion" de un partido de un empleado y el "resultado_partido" del partido para esa predicción y calcula el puntaje total para esa predicción según el resultado del partido</b>
+ * <b>Función que recibe una predicción de un partido de un empleado y el resultado del partido para esa predicción y calcula el puntaje total para esa predicción según el resultado del partido</b>
  * @param {Object} prediccion Predicción de un partido de un empleado
  * @param {Object} resultado_partido Resultado del partido para esa predicción
  * @returns {Promise<Object>} <b>{ usuario_id: "1", nombres: "Lisandro", apellidos: "Oviedo", puntaje: "999", fecha_prediccion: "2024-07-04 15:38:00" }</b>

@@ -5,9 +5,6 @@
 
 require("dotenv").config();
 
-/**
- * <b>Instancia del servidor</b>
- */
 const server = require("./src/server.js");
 
 const { conn } = require("./src/db.js");
@@ -25,7 +22,6 @@ const { cargarEmpresas } = require("./src/controllers/empresas_controllers.js");
 const {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
-  prediccion1y2,
   cargarEmpleadosExcel,
   tablaPosicionesClaros,
   tablaPosicionesLAMAR,
@@ -59,15 +55,13 @@ conn
       // await cargarTorneos();
       // await cargarPartidos();
 
-      // await cargarEmpleadosExcel();
+      // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
 
-      // await prediccion1y2();
-
-      // await tablaPosicionesClaros(1);
+      // await tablaPosicionesClaros(true);
 
       // await tablaPosicionesLAMAR(5);
 
-      // await prediccionesFaltantes(24);
+      // await prediccionesFaltantes(24, "Fase de grupos");
 
       await cerrarPartidos().then(() => {
         console.log(

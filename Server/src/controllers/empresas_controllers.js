@@ -1,3 +1,8 @@
+/**
+ * <b>Funciones relacionadas a las empresas</b>
+ * @module "src/controllers/empresas_controllers.js"
+ */
+
 const axios = require("axios");
 
 const { conn, Empresa, Quiniela } = require("../db");
@@ -13,10 +18,14 @@ const {
 
 const { fechaHoraActual } = require("../utils/formatearFecha");
 
+/**
+ * <b>Función para cargar las empresas desde la API</b>
+ */
 const cargarEmpresas = async () => {
   let t;
 
   try {
+    // @ts-ignore
     const { data } = await axios(API_EMPLEADOS);
 
     console.log(`${fechaHoraActual()} - Hizo la consulta de empresas`);
@@ -202,6 +211,7 @@ const cargarEmpresas = async () => {
         await Empresa.create(
           {
             quiniela_id:
+              // @ts-ignore
               quiniela !== null ? asignar_quiniela.quiniela_id : null,
             codigo_empresa: empresaAPI.codigo_empresa,
             nombre: ordenarNombresAPI(empresaAPI.descripcion_empresa),
@@ -234,10 +244,14 @@ const cargarEmpresas = async () => {
 
           await Empresa.create(
             {
+              // @ts-ignore
               quiniela_id: quiniela_faltante.quiniela_id,
+              // @ts-ignore
               codigo_empresa: empresa_faltante.codigo_empresa || null,
               nombre: empresa_faltante.nombre,
+              // @ts-ignore
               direccion: empresa_faltante.direccion_empresa || null,
+              // @ts-ignore
               rif: empresa_faltante.rif_empresa || null,
             },
             { transaction: t }
@@ -250,6 +264,7 @@ const cargarEmpresas = async () => {
 
     console.log(`${fechaHoraActual()} - Terminó de registrar las empresas`);
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }

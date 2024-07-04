@@ -1,4 +1,9 @@
-const { QueryTypes, Model } = require("sequelize");
+/**
+ * <b>Funciones relacionadas a los partidos</b>
+ * @module "src/controllers/partidos_controllers.js"
+ */
+
+const { QueryTypes } = require("sequelize");
 
 const { Op } = require("sequelize");
 
@@ -17,6 +22,9 @@ const { partidos } = require("../utils/partidos");
 
 const { fechaHoraActual } = require("../utils/formatearFecha");
 
+/**
+ * <b>Función para cargar los partidos desde un arreglo</b>
+ */
 const cargarPartidos = async () => {
   let t;
 
@@ -42,19 +50,26 @@ const cargarPartidos = async () => {
         },
       });
 
+      // @ts-ignore
       const [crearPartido, created] = await Partido.findOrCreate({
         where: {
+          // @ts-ignore
           torneo_id: torneo.torneo_id,
           tipo_partido: partido.tipo_partido,
           numero_jornada: partido.numero_jornada,
+          // @ts-ignore
           equipo_a: equipo_a.equipo_id,
+          // @ts-ignore
           equipo_b: equipo_b.equipo_id,
         },
         defaults: {
+          // @ts-ignore
           torneo_id: torneo.torneo_id,
           tipo_partido: partido.tipo_partido,
           numero_jornada: partido.numero_jornada,
+          // @ts-ignore
           equipo_a: equipo_a.equipo_id,
+          // @ts-ignore
           equipo_b: equipo_b.equipo_id,
           fecha_hora_partido: partido.fecha_hora_partido,
         },
@@ -64,6 +79,7 @@ const cargarPartidos = async () => {
       await t.commit();
     }
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }
@@ -72,6 +88,9 @@ const cargarPartidos = async () => {
   }
 };
 
+/**
+ * <b>Función para cerrar todos los partidos activos y con fecha_hora_partido iniciado o 10 minutos por iniciar, de todas las bases de datos</b>
+ */
 const cerrarPartidos = async () => {
   try {
     const partidos_activos = await conn2.query(
@@ -116,6 +135,17 @@ const cerrarPartidos = async () => {
   }
 };
 
+/**
+ * <b>Función que recibe los partidos activos, la conexión hacia esa base de datos y un nombre para identificar la base de datos o el torneo</b>
+ * <ul>
+ * <li>Obtiene la fecha y hora actual del sistema y compara con la fecha y hora de inicio de cada partido</li>
+ * <li>Si la fecha y hora actual del sistema es mayor a la fecha y hora de inicio del partido, cierra el partido</li>
+ * <li>Si la fecha y hora actual del sistema es inferior por 10 minutos a la fecha y hora de inicio del partido, cierra el partido</li>
+ * </ul>
+ * @param {Array<Object>} partidos_activos Arreglo de partidos activos
+ * @param {*} conexion Conexión hacia la base de datos de esos partidos activos
+ * @param {string} bd Nombre de la base de datos o torneo
+ */
 const cerrarPartido = async (partidos_activos, conexion, bd) => {
   let t;
 
@@ -126,6 +156,7 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
       const fecha_hora_partido = partido.fecha_hora_partido;
 
       const diferenciaEnMinutos = Math.abs(
+        // @ts-ignore
         Math.floor((fecha_actual - fecha_hora_partido) / (1000 * 60))
       );
 
@@ -173,14 +204,22 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
   }
 };
 
-const prediccionesFaltantes = async (partido_id_participado) => {
+/**
+ * <b>Función que consulta todos los empleados que participaron en un partido e inserta registros en la tabla "predicciones" de otros tipos de partido con goles en nulo</b>
+ * @param {number} partido_id_participado ID del partido a consultar última predicción como referencia de que un empleado participó
+ * @param {string} tipo_partido_participado Tipo de partido participado
+ */
+const prediccionesFaltantes = async (
+  partido_id_participado,
+  tipo_partido_participado
+) => {
   let t;
 
   try {
     const partidosConPrediccionesFaltantes = await Partido.findAll({
       where: {
         tipo_partido: {
-          [Op.ne]: "Fase de grupos",
+          [Op.ne]: tipo_partido_participado,
         },
       },
     });
@@ -198,7 +237,9 @@ const prediccionesFaltantes = async (partido_id_participado) => {
         for (const partido of partidosConPrediccionesFaltantes) {
           const prediccion_faltante = await Predicciones.findOne({
             where: {
+              // @ts-ignore
               empleado_id: prediccion.empleado_id,
+              // @ts-ignore
               partido_id: partido.partido_id,
             },
           });
@@ -209,11 +250,15 @@ const prediccionesFaltantes = async (partido_id_participado) => {
             const [prediccionFaltante, created] =
               await Predicciones.findOrCreate({
                 where: {
+                  // @ts-ignore
                   empleado_id: prediccion.empleado_id,
+                  // @ts-ignore
                   partido_id: partido.partido_id,
                 },
                 defaults: {
+                  // @ts-ignore
                   empleado_id: prediccion.empleado_id,
+                  // @ts-ignore
                   partido_id: partido.partido_id,
                 },
                 transaction: t,
@@ -229,6 +274,7 @@ const prediccionesFaltantes = async (partido_id_participado) => {
 
         console.log(
           `${fechaHoraActual()} - Se crearon ${predicciones_creadas} predicciones para el empleado ID: ${
+            // @ts-ignore
             prediccion.empleado_id
           }`
         );
@@ -238,6 +284,7 @@ const prediccionesFaltantes = async (partido_id_participado) => {
       `${fechaHoraActual()} - Finalizó el proceso de predicciones faltantes`
     );
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }

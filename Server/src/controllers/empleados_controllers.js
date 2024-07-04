@@ -1,3 +1,8 @@
+/**
+ * <b>Funciones relacionadas a los empleados</b>
+ * @module "src/controllers/empleados_controllers.js"
+ */
+
 const axios = require("axios");
 
 const {
@@ -29,6 +34,9 @@ const { empleados_faltantes } = require("../utils/empleados");
 const XlsxPopulate = require("xlsx-populate");
 const path = require("path");
 
+/**
+ * <b>Función para cargar los empleados desde la API</b>
+ */
 const cargarEmpleados = async () => {
   let t;
 
@@ -39,6 +47,7 @@ const cargarEmpleados = async () => {
       },
     });
 
+    // @ts-ignore
     const { data } = await axios(API_EMPLEADOS);
 
     console.log(`${fechaHoraActual()} - Hizo la consulta de empleados`);
@@ -68,7 +77,9 @@ const cargarEmpleados = async () => {
 
             await Empleado.create(
               {
+                // @ts-ignore
                 rol_id: rolEmpleado.rol_id,
+                // @ts-ignore
                 empresa_id: empresa_corporativo.empresa_id,
                 codigo_empleado: empleadoAPI.codigo_empleado,
                 cedula: empleadoAPI.cedula,
@@ -104,7 +115,9 @@ const cargarEmpleados = async () => {
 
             await Empleado.create(
               {
+                // @ts-ignore
                 rol_id: rolEmpleado.rol_id,
+                // @ts-ignore
                 empresa_id: empresa.empresa_id,
                 codigo_empleado: empleadoAPI.codigo_empleado,
                 cedula: empleadoAPI.cedula,
@@ -125,6 +138,7 @@ const cargarEmpleados = async () => {
 
     console.log(`${fechaHoraActual()} - Terminó de registrar los empleados`);
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }
@@ -133,6 +147,9 @@ const cargarEmpleados = async () => {
   }
 };
 
+/**
+ * <b>Función para cargar los empleados faltantes desde un arreglo</b>
+ */
 const cargarEmpleadosFaltantes = async () => {
   let t;
 
@@ -162,7 +179,9 @@ const cargarEmpleadosFaltantes = async () => {
 
           await Empleado.create(
             {
+              // @ts-ignore
               rol_id: rolEmpleado.rol_id,
+              // @ts-ignore
               empresa_id: empresa.empresa_id,
               codigo_empleado: empleado_faltante.codigo_empleado,
               cedula: empleado_faltante.cedula,
@@ -170,6 +189,7 @@ const cargarEmpleadosFaltantes = async () => {
               nombres: empleado_faltante.nombres,
               apellidos: empleado_faltante.apellidos,
               fecha_nacimiento: empleado_faltante.fecha_nacimiento,
+              // @ts-ignore
               direccion: empleado_faltante.direccion || null,
             },
             { transaction: t }
@@ -180,6 +200,7 @@ const cargarEmpleadosFaltantes = async () => {
       }
     }
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }
@@ -188,183 +209,23 @@ const cargarEmpleadosFaltantes = async () => {
   }
 };
 
-const prediccion1y2 = async () => {
-  let t;
-
-  try {
-    const empleados = await Empleado.findAll({
-      attributes: ["empleado_id", "cedula"],
-    });
-
-    const partidos = await Partido.findAll({
-      attributes: ["partido_id"],
-    });
-
-    console.log(`${fechaHoraActual()} - Inició el proceso`);
-
-    for (const empleado of empleados) {
-      let prediccion = await Predicciones.findOne({
-        attributes: [
-          "prediccion_id",
-          "empleado_id",
-          "partido_id",
-          "goles_equipo_a",
-          "goles_equipo_b",
-        ],
-        where: {
-          empleado_id: empleado.empleado_id,
-          partido_id: 1,
-        },
-      });
-
-      let prediccion2 = await Predicciones.findOne({
-        attributes: [
-          "prediccion_id",
-          "empleado_id",
-          "partido_id",
-          "goles_equipo_a",
-          "goles_equipo_b",
-        ],
-        where: {
-          empleado_id: empleado.empleado_id,
-          partido_id: 2,
-        },
-      });
-
-      if (!prediccion) {
-        for (const partido of partidos) {
-          if (partido.partido_id === 1) {
-            t = await conn.transaction();
-
-            await Predicciones.findOrCreate({
-              where: {
-                empleado_id: empleado.empleado_id,
-                partido_id: partido.partido_id,
-              },
-              defaults: {
-                empleado_id: empleado.empleado_id,
-                partido_id: partido.partido_id,
-                goles_equipo_a: 2,
-                goles_equipo_b: 0,
-              },
-              transaction: t,
-            });
-
-            await t.commit();
-          } else if (partido.partido_id === 2) {
-            t = await conn.transaction();
-
-            await Predicciones.findOrCreate({
-              where: {
-                empleado_id: empleado.empleado_id,
-                partido_id: partido.partido_id,
-              },
-              defaults: {
-                empleado_id: empleado.empleado_id,
-                partido_id: partido.partido_id,
-                goles_equipo_a: 1,
-                goles_equipo_b: 2,
-              },
-              transaction: t,
-            });
-
-            await t.commit();
-          } else {
-            t = await conn.transaction();
-
-            await Predicciones.findOrCreate({
-              where: {
-                empleado_id: empleado.empleado_id,
-                partido_id: partido.partido_id,
-              },
-              defaults: {
-                empleado_id: empleado.empleado_id,
-                partido_id: partido.partido_id,
-              },
-              transaction: t,
-            });
-
-            await t.commit();
-          }
-        }
-
-        console.log(
-          `${fechaHoraActual()} - Se crearon las predicciones de`,
-          empleado.cedula
-        );
-      } else {
-        if (
-          prediccion.goles_equipo_a === null ||
-          prediccion.goles_equipo_b === null
-        ) {
-          t = await conn.transaction();
-
-          await Predicciones.update(
-            {
-              goles_equipo_a: 2,
-              goles_equipo_b: 0,
-            },
-            {
-              where: { empleado_id: empleado.empleado_id, partido_id: 1 },
-            },
-            { transaction: t }
-          );
-
-          await t.commit();
-
-          console.log(
-            `${fechaHoraActual()} - Se actualizó el partido 1 de`,
-            empleado.cedula
-          );
-        }
-
-        if (
-          prediccion2 &&
-          (prediccion2.goles_equipo_a === null ||
-            prediccion2.goles_equipo_b === null)
-        ) {
-          t = await conn.transaction();
-
-          await Predicciones.update(
-            {
-              goles_equipo_a: 1,
-              goles_equipo_b: 2,
-            },
-            {
-              where: { empleado_id: empleado.empleado_id, partido_id: 2 },
-            },
-            { transaction: t }
-          );
-
-          await t.commit();
-
-          console.log(
-            `${fechaHoraActual()} - Se actualizó el partido 2 de`,
-            empleado.cedula
-          );
-        }
-      }
-    }
-
-    console.log(`${fechaHoraActual()} - Ya terminó el proceso`);
-  } catch (error) {
-    if (t && !t.finished) {
-      await t.rollback();
-    }
-
-    throw new Error(
-      `Error al actualizar la predicción 1 y/o 2: ${error.message}`
-    );
-  }
-};
-
-const cargarEmpleadosExcel = async () => {
+/**
+ * <b>Función para cargar empleados faltantes desde un archivo Excel dentro de la carpeta /src/utils</b>
+ * @param {string} nombre_excel_con_extension Nombre del archivo Excel con su extensión
+ * @param {number} columna_desde Número de columna a empezar a leer
+ * @param {number} columna_hasta Número de columna a terminar de leer
+ */
+const cargarEmpleadosExcel = async (
+  nombre_excel_con_extension,
+  columna_desde,
+  columna_hasta
+) => {
   let t;
 
   try {
     const excelPath = path.join(
       __dirname,
-      "../../src/utils/PERSONAL-AQUALAGO.xlsx"
+      `../../src/utils/${nombre_excel_con_extension}`
     );
 
     const workbook = await XlsxPopulate.fromFileAsync(excelPath);
@@ -375,7 +236,10 @@ const cargarEmpleadosExcel = async () => {
 
     let conteo = 0;
 
-    for (let row = 9; row <= 80; row++) {
+    //
+    for (let row = columna_desde; row <= columna_hasta; row++) {
+      // VERIFICAR EN QUÉ FILA ESTÁ EL NOMBRE, APELLIDO Y CÉDULA Y REEMPLAZAR
+
       // const nombrecompleto = worksheet.cell(`B${row}`).value();
       const nombre = worksheet.cell(`C${row}`).value();
       const apellido = worksheet.cell(`D${row}`).value();
@@ -411,6 +275,7 @@ const cargarEmpleadosExcel = async () => {
       conteo
     );
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }
@@ -419,6 +284,10 @@ const cargarEmpleadosExcel = async () => {
   }
 };
 
+/**
+ * <b>Función para generar reporte de tabla de posiciones general de una base de datos</b>
+ * @param {boolean} ficticios true = Reporte con ficticios | false = Reporte sin ficticios
+ */
 const tablaPosicionesClaros = async (ficticios) => {
   const excelPath = path.join(
     __dirname,
@@ -443,6 +312,7 @@ const tablaPosicionesClaros = async (ficticios) => {
       for (const resultado of resultado_partido) {
         let predicciones = await Predicciones.findAll({
           where: {
+            // @ts-ignore
             partido_id: resultado.partido_id,
           },
           include: [
@@ -464,7 +334,9 @@ const tablaPosicionesClaros = async (ficticios) => {
         if (predicciones) {
           for (const prediccion of predicciones) {
             if (
+              // @ts-ignore
               (!ficticios && prediccion.Empleado.direccion === "04127777777") ||
+              // @ts-ignore
               prediccion.Empleado.cedula === "21544607"
             ) {
               continue;
@@ -488,6 +360,7 @@ const tablaPosicionesClaros = async (ficticios) => {
         } else {
           console.log(
             `${fechaHoraActual()} - No hay predicciones para el partido:`,
+            // @ts-ignore
             resultado.partido_id
           );
         }
@@ -544,6 +417,10 @@ const tablaPosicionesClaros = async (ficticios) => {
   }
 };
 
+/**
+ * <b>Función para generar reporte de tabla de posiciones de una quiniela de la Copa América LAMAR</b>
+ * @param {number} quiniela_id ID de la quiniela a generar el reporte
+ */
 const tablaPosicionesLAMAR = async (quiniela_id) => {
   if (!quiniela_id) {
     return console.log(`${fechaHoraActual()} - Debes ingresar el quiniela_id`);
@@ -582,6 +459,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
       for (const resultado of resultado_partido) {
         let predicciones = await Predicciones.findAll({
           where: {
+            // @ts-ignore
             partido_id: resultado.partido_id,
           },
           include: [
@@ -630,6 +508,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
         } else {
           console.log(
             `${fechaHoraActual()} - No hay predicciones para el partido:`,
+            // @ts-ignore
             resultado.partido_id
           );
         }
@@ -664,6 +543,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
           row++;
         }
 
+        // @ts-ignore
         const nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre})`;
 
         workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
@@ -685,7 +565,6 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
 module.exports = {
   cargarEmpleados,
   cargarEmpleadosFaltantes,
-  prediccion1y2,
   cargarEmpleadosExcel,
   tablaPosicionesClaros,
   tablaPosicionesLAMAR,

@@ -1,9 +1,15 @@
+/**
+ * <b>Funciones relacionadas a los equipos</b>
+ * @module "src/controllers/equipos_controllers.js"
+ */
+
 const { conn, Equipo } = require("../db");
 
 const { equipos } = require("../utils/equipos");
 
-const { fechaHoraActual } = require("../utils/formatearFecha");
-
+/**
+ * <b>Función para cargar los equipos desde un arreglo</b>
+ */
 const cargarEquipos = async () => {
   let t;
 
@@ -23,6 +29,7 @@ const cargarEquipos = async () => {
       await t.commit();
     }
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }

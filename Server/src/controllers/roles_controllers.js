@@ -1,9 +1,15 @@
+/**
+ * <b>Funciones relacionadas a los roles</b>
+ * @module "src/controllers/roles_controllers.js"
+ */
+
 const { conn, Roles } = require("../db");
 
 const { roles } = require("../utils/roles");
 
-const { fechaHoraActual } = require("../utils/formatearFecha");
-
+/**
+ * <b>Función para cargar los roles desde un arreglo</b>
+ */
 const cargarRoles = async () => {
   let t;
 
@@ -23,6 +29,7 @@ const cargarRoles = async () => {
       await t.commit();
     }
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }

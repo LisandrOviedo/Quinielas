@@ -1,9 +1,15 @@
+/**
+ * <b>Funciones relacionadas a las quinielas</b>
+ * @module "src/controllers/quinielas_controllers.js"
+ */
+
 const { conn, Quiniela } = require("../db");
 
 const { quinielas } = require("../utils/quinielas");
 
-const { fechaHoraActual } = require("../utils/formatearFecha");
-
+/**
+ * <b>Función para cargar las quinielas desde un arreglo</b>
+ */
 const cargarQuinielas = async () => {
   let t;
 
@@ -22,6 +28,7 @@ const cargarQuinielas = async () => {
       await t.commit();
     }
   } catch (error) {
+    // @ts-ignore
     if (t && !t.finished) {
       await t.rollback();
     }

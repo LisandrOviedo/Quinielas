@@ -1,3 +1,8 @@
+/**
+ * <b>Conexión a la base de datos y relación de tablas</b>
+ * @module "src/db.js"
+ */
+
 const { Sequelize } = require("sequelize");
 const fs = require("fs");
 const path = require("path");
@@ -14,6 +19,10 @@ const {
   PORT_DB,
 } = process.env;
 
+/**
+ * <b>Conexión a la base de datos principal</b>
+ */
+// @ts-ignore
 const sequelize = new Sequelize(DB, USERDB, PASSWORD, {
   host: HOST,
   dialect: DIALECT,
@@ -23,6 +32,10 @@ const sequelize = new Sequelize(DB, USERDB, PASSWORD, {
   timezone: "-04:00",
 });
 
+/**
+ * <b>Conexión a la base de datos de la Copa América LAMAR</b>
+ */
+// @ts-ignore
 const sequelize2 = new Sequelize(DB_AMERICA_LAMAR, USERDB, PASSWORD, {
   host: HOST,
   dialect: DIALECT,
@@ -32,6 +45,10 @@ const sequelize2 = new Sequelize(DB_AMERICA_LAMAR, USERDB, PASSWORD, {
   timezone: "-04:00",
 });
 
+/**
+ * <b>Conexión a la base de datos de la Copa América Claros</b>
+ */
+// @ts-ignore
 const sequelize3 = new Sequelize(DB_AMERICA_CLAROS, USERDB, PASSWORD, {
   host: HOST,
   dialect: DIALECT,
@@ -41,6 +58,10 @@ const sequelize3 = new Sequelize(DB_AMERICA_CLAROS, USERDB, PASSWORD, {
   timezone: "-04:00",
 });
 
+/**
+ * <b>Conexión a la base de datos de la EURO Copa Claros</b>
+ */
+// @ts-ignore
 const sequelize4 = new Sequelize(DB_EURO_CLAROS, USERDB, PASSWORD, {
   host: HOST,
   dialect: DIALECT,
@@ -70,6 +91,7 @@ let capsEntries = entries.map((entry) => [
   entry[0][0].toUpperCase() + entry[0].slice(1),
   entry[1],
 ]);
+// @ts-ignore
 sequelize.models = Object.fromEntries(capsEntries);
 
 const {
