@@ -1,3 +1,12 @@
+/**
+ * <b>Equipos de la Copa América 2024</b>
+ * @module "src/utils/equipos.js"
+ */
+
+/**
+ * <b>Lista de equipos</b>
+ * @type {Array<{nombre: string, ruta_imagen: string}>}
+ */
 const equipos = [
   {
     nombre: "Por definirse",

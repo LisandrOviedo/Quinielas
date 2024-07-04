@@ -1,19 +1,19 @@
 /**
- * Archivo index.js
- * @module index
+ * <b>Archivo raiz para la inicialización del servidor</b>
+ * @module "index.js"
  */
 
 require("dotenv").config();
 
 /**
- * Instancia del servidor
+ * <b>Instancia del servidor</b>
  */
 const server = require("./src/server.js");
 
 const { conn } = require("./src/db.js");
 
 /**
- * Puerto que usará el servidor al iniciar
+ * <b>Puerto que usará el servidor al iniciar</b>
  * @type {(string|number)}
  */
 const PORT = process.env.PORT_SERVER || 3001;

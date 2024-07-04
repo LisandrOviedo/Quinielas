@@ -1,3 +1,12 @@
+/**
+ * <b>Empleados faltantes en la API</b>
+ * @module "src/utils/empleados.js"
+ */
+
+/**
+ * <b>Lista de empleados</b>
+ * @type {Array<{empresa: string, codigo_empleado: string, cedula: string, clave: string, nombres: string, apellidos: string, fecha_nacimiento: string}>}
+ */
 const empleados_faltantes = [
   {
     empresa: "Procesadora Antartica C.A",

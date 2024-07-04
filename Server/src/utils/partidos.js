@@ -1,3 +1,12 @@
+/**
+ * <b>Partidos de fase de grupos de la Copa América 2024</b>
+ * @module "src/utils/partidos.js"
+ */
+
+/**
+ * <b>Lista de partidos</b>
+ * @type {Array<{tipo_partido: string, numero_jornada: string, equipo_a: string, equipo_b: string, fecha_hora_partido: string}>}
+ */
 const partidos = [
   {
     tipo_partido: "Fase de grupos",

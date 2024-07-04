@@ -1,3 +1,12 @@
+/**
+ * <b>Empresas faltantes en la API</b>
+ * @module "src/utils/empresas.js"
+ */
+
+/**
+ * <b>Lista de empresas</b>
+ * @type {Array<{quiniela: string, nombre: string}>}
+ */
 const empresas_faltantes = [
   {
     quiniela: "Maracaibo",

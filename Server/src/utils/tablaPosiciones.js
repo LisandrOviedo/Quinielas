@@ -1,7 +1,16 @@
+/**
+ * <b>Funciones relacionadas a la tabla de posiciones</b>
+ * @module "src/utils/tablaPosiciones.js"
+ */
+
 const fs = require("fs");
 
 const { fechaHoraActual } = require("./formatearFecha");
 
+/**
+ * <b>Función que verifica si una ruta existe, sino, la crea</b>
+ * @param {string} folderPath Ruta a validar (C:\Users\Lisandro\Desktop\Quinielas\Server\src\utils\reportes)
+ */
 const crearCarpetaSiNoExiste = (folderPath) => {
   if (!fs.existsSync(folderPath)) {
     try {
@@ -15,6 +24,12 @@ const crearCarpetaSiNoExiste = (folderPath) => {
   }
 };
 
+/**
+ * <b>Función que recibe una "prediccion" de un partido de un empleado y el "resultado_partido" del partido para esa predicción y calcula el puntaje total para esa predicción según el resultado del partido</b>
+ * @param {Object} prediccion Predicción de un partido de un empleado
+ * @param {Object} resultado_partido Resultado del partido para esa predicción
+ * @returns {Promise<Object>} <b>{ usuario_id: "1", nombres: "Lisandro", apellidos: "Oviedo", puntaje: "999", fecha_prediccion: "2024-07-04 15:38:00" }</b>
+ */
 const calcularPuntos = async (prediccion, resultado_partido) => {
   let puntos = 0;
 
@@ -45,6 +60,7 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
       resultado_partido.Resultado_Partido.goles_equipo_b
   ) {
     // Si acerté los goles de ambos equipos
+
     if (resultado_partido.tipo_partido === "Fase de grupos") {
       puntos = puntos + 2;
     } else {
@@ -57,6 +73,8 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
     resultado_partido.Resultado_Partido.goles_equipo_a -
       resultado_partido.Resultado_Partido.goles_equipo_b
   ) {
+    // Si acerté la diferencia de goles de ambos equipos
+
     if (resultado_partido.tipo_partido === "Fase de grupos") {
       puntos = puntos + 1;
     } else {
