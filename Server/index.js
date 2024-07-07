@@ -63,13 +63,13 @@ conn
 
       // await prediccionesFaltantes(24, "Fase de grupos");
 
-      await cerrarPartidos().then(() => {
-        console.log(
-          `${fechaHoraActual()} - Terminó el proceso de cerrar partidos`
-        );
+      // await cerrarPartidos().then(() => {
+      //   console.log(
+      //     `${fechaHoraActual()} - Terminó el proceso de cerrar partidos`
+      //   );
 
-        process.exit(0);
-      });
+      //   process.exit(0);
+      // });
     });
   })
   .catch((error) => console.error(error));
