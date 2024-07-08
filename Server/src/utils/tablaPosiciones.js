@@ -86,8 +86,8 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
     usuario_id: prediccion.Empleado.empleado_id,
     nombres: prediccion.Empleado.nombres.trim(),
     apellidos: prediccion.Empleado.apellidos.trim(),
+    empresa: prediccion.Empleado.Empresa?.nombre || "",
     puntaje: puntos,
-    fecha_prediccion: prediccion.updatedAt,
   };
 
   return resultado;
