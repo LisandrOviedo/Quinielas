@@ -287,7 +287,7 @@ const cargarEmpleadosExcel = async (
 /**
  * <b>Función para generar reporte de tabla de posiciones general de una base de datos</b>
  * @param {boolean} ficticios true = Reporte con ficticios | false = Reporte sin ficticios
- * @param {number} limite Límite máximo de posiciones (0 = Todas)
+ * @param {number} limite Límite máximo de posiciones (0 = Sin límite)
  */
 const tablaPosicionesClaros = async (ficticios, limite) => {
   const excelPath = path.join(
@@ -419,7 +419,7 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
 /**
  * <b>Función para generar reporte de tabla de posiciones de una quiniela de la Copa América LAMAR</b>
  * @param {number} quiniela_id ID de la quiniela a generar el reporte
- * @param {number} limite Límite máximo de posiciones (0 = Todas)
+ * @param {number} limite Límite máximo de posiciones (0 = Sin límite)
  */
 const tablaPosicionesLAMAR = async (quiniela_id, limite) => {
   if (!quiniela_id) {
