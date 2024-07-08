@@ -57,9 +57,9 @@ conn
 
       // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
 
-      // await tablaPosicionesClaros(true);
+      // await tablaPosicionesClaros(true, 0);
 
-      // await tablaPosicionesLAMAR(5);
+      // await tablaPosicionesLAMAR(5, 0);
 
       // await prediccionesFaltantes(24, "Fase de grupos");
 
