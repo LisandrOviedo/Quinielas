@@ -287,11 +287,12 @@ const cargarEmpleadosExcel = async (
 /**
  * <b>Función para generar reporte de tabla de posiciones general de una base de datos</b>
  * @param {boolean} ficticios true = Reporte con ficticios | false = Reporte sin ficticios
+ * @param {number} cantidad Límite máximo de posiciones (0 = Todas)
  */
-const tablaPosicionesClaros = async (ficticios) => {
+const tablaPosicionesClaros = async (ficticios, cantidad) => {
   const excelPath = path.join(
     __dirname,
-    "../../src/utils/Tabla Posiciones Plantilla.xlsx"
+    "../../src/utils/Tabla Posiciones Claros Plantilla.xlsx"
   );
 
   const destPath = path.join(__dirname, `../../src/utils/reportes`);
@@ -334,10 +335,9 @@ const tablaPosicionesClaros = async (ficticios) => {
         if (predicciones) {
           for (const prediccion of predicciones) {
             if (
+              !ficticios &&
               // @ts-ignore
-              (!ficticios && prediccion.Empleado.direccion === "04127777777") ||
-              // @ts-ignore
-              prediccion.Empleado.cedula === "21544607"
+              prediccion.Empleado.direccion === "04127777777"
             ) {
               continue;
             }
@@ -366,47 +366,46 @@ const tablaPosicionesClaros = async (ficticios) => {
         }
       }
 
-      resultados.sort((a, b) => {
-        // Comparar primero por el puntaje de manera descendente
-        if (b.puntaje !== a.puntaje) {
-          return b.puntaje - a.puntaje;
+      if (resultados.length) {
+        resultados.sort((a, b) => b.puntaje - a.puntaje);
+
+        crearCarpetaSiNoExiste(destPath);
+
+        const workbook = await XlsxPopulate.fromFileAsync(excelPath);
+
+        const worksheet = workbook.sheet(0);
+
+        let row = 2;
+        let posicion = 1;
+
+        for (const resultado of resultados) {
+          if (posicion > cantidad && cantidad !== 0) {
+            break;
+          }
+
+          worksheet.cell(`A${row}`).value(posicion);
+          worksheet.cell(`B${row}`).value(resultado.nombres);
+          worksheet.cell(`C${row}`).value(resultado.apellidos);
+          worksheet.cell(`D${row}`).value(resultado.puntaje);
+
+          row++;
+          posicion++;
         }
-        // Si el puntaje es igual, comparar por la fecha de manera ascendente
-        else {
-          return a.fecha_prediccion - b.fecha_prediccion;
+
+        let nombre_reporte = "";
+
+        if (!ficticios) {
+          nombre_reporte = "Tabla Posiciones Claros (Sin Ficticios)";
+        } else {
+          nombre_reporte = "Tabla Posiciones Claros";
         }
-      });
 
-      crearCarpetaSiNoExiste(destPath);
+        workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
 
-      const workbook = await XlsxPopulate.fromFileAsync(excelPath);
-
-      const worksheet = workbook.sheet(0);
-
-      let row = 2;
-
-      for (const resultado of resultados) {
-        worksheet.cell(`A${row}`).value(resultado.usuario_id);
-        worksheet.cell(`B${row}`).value(resultado.nombres);
-        worksheet.cell(`C${row}`).value(resultado.apellidos);
-        worksheet.cell(`D${row}`).value(resultado.puntaje);
-
-        row++;
+        console.log(
+          `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
+        );
       }
-
-      let nombre_reporte = "";
-
-      if (!ficticios) {
-        nombre_reporte = "Tabla Posiciones Claros (Sin Ficticios)";
-      } else {
-        nombre_reporte = "Tabla Posiciones Claros";
-      }
-
-      workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
-
-      console.log(
-        `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
-      );
     } else {
       console.log(
         `${fechaHoraActual()} - No hay resultados registrados de partidos`
@@ -420,8 +419,9 @@ const tablaPosicionesClaros = async (ficticios) => {
 /**
  * <b>Función para generar reporte de tabla de posiciones de una quiniela de la Copa América LAMAR</b>
  * @param {number} quiniela_id ID de la quiniela a generar el reporte
+ * @param {number} cantidad Límite máximo de posiciones (0 = Todas)
  */
-const tablaPosicionesLAMAR = async (quiniela_id) => {
+const tablaPosicionesLAMAR = async (quiniela_id, cantidad) => {
   if (!quiniela_id) {
     return console.log(`${fechaHoraActual()} - Debes ingresar el quiniela_id`);
   }
@@ -438,7 +438,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
 
   const excelPath = path.join(
     __dirname,
-    "../../src/utils/Tabla Posiciones Plantilla.xlsx"
+    "../../src/utils/Tabla Posiciones LAMAR Plantilla.xlsx"
   );
 
   const destPath = path.join(__dirname, `../../src/utils/reportes`);
@@ -478,7 +478,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
               include: [
                 {
                   model: Empresa,
-                  attributes: ["empresa_id", "quiniela_id"],
+                  attributes: ["empresa_id", "quiniela_id", "nombre"],
                   where: { quiniela_id: quiniela_id },
                   required: true,
                 },
@@ -515,16 +515,7 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
       }
 
       if (resultados.length) {
-        resultados.sort((a, b) => {
-          // Comparar primero por el puntaje de manera descendente
-          if (b.puntaje !== a.puntaje) {
-            return b.puntaje - a.puntaje;
-          }
-          // Si el puntaje es igual, comparar por la fecha de manera ascendente
-          else {
-            return a.fecha_prediccion - b.fecha_prediccion;
-          }
-        });
+        resultados.sort((a, b) => b.puntaje - a.puntaje);
 
         crearCarpetaSiNoExiste(destPath);
 
@@ -533,14 +524,21 @@ const tablaPosicionesLAMAR = async (quiniela_id) => {
         const worksheet = workbook.sheet(0);
 
         let row = 2;
+        let posicion = 1;
 
         for (const resultado of resultados) {
-          worksheet.cell(`A${row}`).value(resultado.usuario_id);
+          if (posicion > cantidad && cantidad !== 0) {
+            break;
+          }
+
+          worksheet.cell(`A${row}`).value(posicion);
           worksheet.cell(`B${row}`).value(resultado.nombres);
           worksheet.cell(`C${row}`).value(resultado.apellidos);
-          worksheet.cell(`D${row}`).value(resultado.puntaje);
+          worksheet.cell(`D${row}`).value(resultado.empresa);
+          worksheet.cell(`E${row}`).value(resultado.puntaje);
 
           row++;
+          posicion++;
         }
 
         // @ts-ignore
