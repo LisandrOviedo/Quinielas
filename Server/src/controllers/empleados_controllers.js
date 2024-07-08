@@ -287,9 +287,9 @@ const cargarEmpleadosExcel = async (
 /**
  * <b>Función para generar reporte de tabla de posiciones general de una base de datos</b>
  * @param {boolean} ficticios true = Reporte con ficticios | false = Reporte sin ficticios
- * @param {number} cantidad Límite máximo de posiciones (0 = Todas)
+ * @param {number} limite Límite máximo de posiciones (0 = Todas)
  */
-const tablaPosicionesClaros = async (ficticios, cantidad) => {
+const tablaPosicionesClaros = async (ficticios, limite) => {
   const excelPath = path.join(
     __dirname,
     "../../src/utils/Tabla Posiciones Claros Plantilla.xlsx"
@@ -379,7 +379,7 @@ const tablaPosicionesClaros = async (ficticios, cantidad) => {
         let posicion = 1;
 
         for (const resultado of resultados) {
-          if (posicion > cantidad && cantidad !== 0) {
+          if (posicion > limite && limite !== 0) {
             break;
           }
 
@@ -419,9 +419,9 @@ const tablaPosicionesClaros = async (ficticios, cantidad) => {
 /**
  * <b>Función para generar reporte de tabla de posiciones de una quiniela de la Copa América LAMAR</b>
  * @param {number} quiniela_id ID de la quiniela a generar el reporte
- * @param {number} cantidad Límite máximo de posiciones (0 = Todas)
+ * @param {number} limite Límite máximo de posiciones (0 = Todas)
  */
-const tablaPosicionesLAMAR = async (quiniela_id, cantidad) => {
+const tablaPosicionesLAMAR = async (quiniela_id, limite) => {
   if (!quiniela_id) {
     return console.log(`${fechaHoraActual()} - Debes ingresar el quiniela_id`);
   }
@@ -527,7 +527,7 @@ const tablaPosicionesLAMAR = async (quiniela_id, cantidad) => {
         let posicion = 1;
 
         for (const resultado of resultados) {
-          if (posicion > cantidad && cantidad !== 0) {
+          if (posicion > limite && limite !== 0) {
             break;
           }
 
