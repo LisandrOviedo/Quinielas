@@ -34,6 +34,10 @@ const { empleados_faltantes } = require("../utils/empleados");
 const XlsxPopulate = require("xlsx-populate");
 const path = require("path");
 
+const PDFDocument = require("pdfkit-table");
+const fs = require("fs");
+const nodemailer = require("nodemailer");
+
 /**
  * <b>Función para cargar los empleados desde la API</b>
  */
@@ -290,13 +294,6 @@ const cargarEmpleadosExcel = async (
  * @param {number} limite Límite máximo de posiciones (0 = Sin límite)
  */
 const tablaPosicionesClaros = async (ficticios, limite) => {
-  const excelPath = path.join(
-    __dirname,
-    "../../src/utils/Tabla Posiciones Claros Plantilla.xlsx"
-  );
-
-  const destPath = path.join(__dirname, `../../src/utils/reportes`);
-
   try {
     const resultado_partido = await Partido.findAll({
       include: [
@@ -369,38 +366,80 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
       if (resultados.length) {
         resultados.sort((a, b) => b.puntaje - a.puntaje);
 
+        const destPath = path.join(__dirname, `../../src/utils/reportes`);
+
         crearCarpetaSiNoExiste(destPath);
 
-        const workbook = await XlsxPopulate.fromFileAsync(excelPath);
-
-        const worksheet = workbook.sheet(0);
-
-        let row = 2;
-        let posicion = 1;
-
-        for (const resultado of resultados) {
-          if (posicion > limite && limite !== 0) {
-            break;
-          }
-
-          worksheet.cell(`A${row}`).value(posicion);
-          worksheet.cell(`B${row}`).value(resultado.nombres);
-          worksheet.cell(`C${row}`).value(resultado.apellidos);
-          worksheet.cell(`D${row}`).value(resultado.puntaje);
-
-          row++;
-          posicion++;
-        }
+        // @ts-ignore
+        const doc = new PDFDocument({
+          bufferPages: true,
+          font: "Helvetica",
+        });
 
         let nombre_reporte = "";
 
         if (!ficticios) {
-          nombre_reporte = "Tabla Posiciones Claros (Sin Ficticios)";
+          if (limite === 0) {
+            nombre_reporte = "Tabla Posiciones Claros (Sin Ficticios)";
+          } else {
+            nombre_reporte = `Tabla Posiciones Claros (Sin Ficticios) (Primeros ${limite})`;
+          }
         } else {
-          nombre_reporte = "Tabla Posiciones Claros";
+          if (limite === 0) {
+            nombre_reporte = "Tabla Posiciones Claros";
+          } else {
+            nombre_reporte = `Tabla Posiciones Claros (Primeros ${limite})`;
+          }
         }
 
-        workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
+        const pdf_path = path.join(
+          __dirname,
+          `../../src/utils/reportes/${nombre_reporte}.pdf`
+        );
+
+        doc.pipe(fs.createWriteStream(pdf_path));
+
+        doc
+          .fontSize(14)
+          .font("Helvetica-Bold")
+          .text(`${nombre_reporte}`, { align: "center" });
+        doc.moveDown();
+        doc.moveDown();
+
+        let posicion = 1;
+
+        (async function createTable() {
+          const table = {
+            headers: ["POSICIÓN", "NOMBRES", "APELLIDOS", "PUNTAJE"],
+            rows: [],
+          };
+          for (const resultado of resultados) {
+            if (posicion > limite && limite !== 0) {
+              break;
+            }
+
+            const row = [
+              posicion,
+              resultado.nombres,
+              resultado.apellidos,
+              resultado.puntaje,
+            ];
+
+            // @ts-ignore
+            table.rows.push(row);
+
+            posicion++;
+          }
+          await doc.table(table, {
+            columnsSize: [70, 170, 170, 60],
+            prepareHeader: () => doc.fontSize(11).font("Helvetica-Bold"),
+            prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+              doc.fontSize(10).font("Helvetica");
+            },
+          });
+        })();
+
+        doc.end();
 
         console.log(
           `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
@@ -412,7 +451,7 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
       );
     }
   } catch (error) {
-    throw new Error(`Error al crear el reporte excel: ${error.message}`);
+    throw new Error(`Error al crear el reporte: ${error.message}`);
   }
 };
 
@@ -435,13 +474,6 @@ const tablaPosicionesLAMAR = async (quiniela_id, limite) => {
   if (!quiniela) {
     return console.log(`${fechaHoraActual()} - No existe esa quiniela`);
   }
-
-  const excelPath = path.join(
-    __dirname,
-    "../../src/utils/Tabla Posiciones LAMAR Plantilla.xlsx"
-  );
-
-  const destPath = path.join(__dirname, `../../src/utils/reportes`);
 
   try {
     const resultado_partido = await Partido.findAll({
@@ -517,34 +549,111 @@ const tablaPosicionesLAMAR = async (quiniela_id, limite) => {
       if (resultados.length) {
         resultados.sort((a, b) => b.puntaje - a.puntaje);
 
+        const destPath = path.join(__dirname, `../../src/utils/reportes`);
+
         crearCarpetaSiNoExiste(destPath);
 
-        const workbook = await XlsxPopulate.fromFileAsync(excelPath);
+        // @ts-ignore
+        const doc = new PDFDocument({
+          bufferPages: true,
+          font: "Helvetica",
+        });
 
-        const worksheet = workbook.sheet(0);
+        let nombre_reporte = "";
 
-        let row = 2;
-        let posicion = 1;
-
-        for (const resultado of resultados) {
-          if (posicion > limite && limite !== 0) {
-            break;
-          }
-
-          worksheet.cell(`A${row}`).value(posicion);
-          worksheet.cell(`B${row}`).value(resultado.nombres);
-          worksheet.cell(`C${row}`).value(resultado.apellidos);
-          worksheet.cell(`D${row}`).value(resultado.empresa);
-          worksheet.cell(`E${row}`).value(resultado.puntaje);
-
-          row++;
-          posicion++;
+        if (limite === 0) {
+          // @ts-ignore
+          nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre})`;
+        } else {
+          // @ts-ignore
+          nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre}) (Primeros ${limite})`;
         }
 
-        // @ts-ignore
-        const nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre})`;
+        const pdf_path = path.join(
+          __dirname,
+          `../../src/utils/reportes/${nombre_reporte}.pdf`
+        );
 
-        workbook.toFileAsync(`${destPath}/${nombre_reporte}.xlsx`);
+        doc.pipe(fs.createWriteStream(pdf_path));
+
+        doc
+          .fontSize(14)
+          .font("Helvetica-Bold")
+          .text(`${nombre_reporte}`, { align: "center" });
+        doc.moveDown();
+        doc.moveDown();
+
+        let posicion = 1;
+
+        (async function createTable() {
+          const table = {
+            headers: ["POSICIÓN", "NOMBRES", "APELLIDOS", "PUNTAJE"],
+            rows: [],
+          };
+          for (const resultado of resultados) {
+            if (posicion > limite && limite !== 0) {
+              break;
+            }
+
+            const row = [
+              posicion,
+              resultado.nombres,
+              resultado.apellidos,
+              resultado.puntaje,
+            ];
+
+            // @ts-ignore
+            table.rows.push(row);
+
+            posicion++;
+          }
+          await doc.table(table, {
+            columnsSize: [70, 170, 170, 60],
+            prepareHeader: () => doc.fontSize(11).font("Helvetica-Bold"),
+            prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+              doc.fontSize(10).font("Helvetica");
+            },
+          });
+        })();
+
+        doc.end();
+
+        // const transporter = nodemailer.createTransport({
+        //   // @ts-ignore
+        //   host: "smtp.gmail.com",
+        //   port: 587,
+        //   secure: false,
+        //   auth: {
+        //     user: "lisandrotv24@gmail.com",
+        //     pass: 26388249,
+        //   },
+        // });
+
+        // const pdfFileContent = fs.readFileSync(pdf_path);
+
+        // if (pdfFileContent) {
+        //   const message = {
+        //     from: "lisandrotv24@gmail.com",
+        //     to: "lisandrotv24@gmail.com",
+        //     subject: nombre_reporte,
+        //     text: nombre_reporte,
+        //     attachments: [
+        //       {
+        //         filename: `${nombre_reporte}.pdf`,
+        //         content: pdfFileContent,
+        //         contentType: "application/pdf",
+        //       },
+        //     ],
+        //   };
+
+        //   transporter.sendMail(message, (error, info) => {
+        //     if (error) {
+        //       console.log(error);
+        //     } else {
+        //       console.log("Correo enviado: " + info.response);
+        //     }
+        //   });
+        // }
 
         console.log(
           `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
