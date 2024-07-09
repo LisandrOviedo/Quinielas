@@ -171,13 +171,13 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
           }
         );
 
-        const [actualizarPrediccion, metadata] = await conexion.query(
-          `UPDATE predicciones SET goles_equipo_a = 0, goles_equipo_b = 0 WHERE partido_id = ${partido.partido_id} AND (goles_equipo_a is null OR goles_equipo_b is null)`,
-          {
-            t,
-            type: QueryTypes.UPDATE,
-          }
-        );
+        // const [actualizarPrediccion, metadata] = await conexion.query(
+        //   `UPDATE predicciones SET goles_equipo_a = 0, goles_equipo_b = 0 WHERE partido_id = ${partido.partido_id} AND (goles_equipo_a is null OR goles_equipo_b is null)`,
+        //   {
+        //     t,
+        //     type: QueryTypes.UPDATE,
+        //   }
+        // );
 
         await t.commit();
 
@@ -188,11 +188,11 @@ const cerrarPartido = async (partidos_activos, conexion, bd) => {
           fecha_hora_partido.toLocaleString()
         );
 
-        console.log(
-          `${fechaHoraActual()} - Se actualizaron ${metadata} predicciones del partido ${
-            partido.partido_id
-          } (${bd})`
-        );
+        // console.log(
+        //   `${fechaHoraActual()} - Se actualizaron ${metadata} predicciones del partido ${
+        //     partido.partido_id
+        //   } (${bd})`
+        // );
       }
     }
   } catch (error) {
