@@ -7,13 +7,13 @@ require("dotenv").config();
 
 const server = require("./src/server.js");
 
-const { conn } = require("./src/db.js");
+const { conn, conn3, conn4 } = require("./src/db.js");
 
 /**
  * <b>Puerto que usará el servidor al iniciar</b>
  * @type {(string|number)}
  */
-const PORT = process.env.PORT_SERVER || 3001;
+const PORT = process.env.PORT_SERVER || 4055;
 
 const { fechaHoraActual } = require("./src/utils/formatearFecha.js");
 
@@ -57,9 +57,20 @@ conn
 
       // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
 
-      // await tablaPosicionesClaros(true, 0);
+      // await tablaPosicionesClaros(conn3, true, 0, [
+      // "rlaguna@grupo-lamar.com",
+      // "aseco@grupo-lamar.com",
+      // ]);
 
-      // await tablaPosicionesLAMAR(5, 0);
+      // await tablaPosicionesClaros(conn4, true, 0, [
+      // "rlaguna@grupo-lamar.com",
+      // "aseco@grupo-lamar.com",
+      // ]);
+
+      // await tablaPosicionesLAMAR(5, 0, [
+      //   "rlaguna@grupo-lamar.com",
+      //   "aseco@grupo-lamar.com",
+      // ]);
 
       // await prediccionesFaltantes(24, "Fase de grupos");
 
