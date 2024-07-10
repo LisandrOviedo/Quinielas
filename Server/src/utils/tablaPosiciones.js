@@ -35,14 +35,11 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
 
   if (
     (prediccion.goles_equipo_a > prediccion.goles_equipo_b &&
-      resultado_partido.Resultado_Partido.goles_equipo_a >
-        resultado_partido.Resultado_Partido.goles_equipo_b) ||
+      resultado_partido.goles_equipo_a > resultado_partido.goles_equipo_b) ||
     (prediccion.goles_equipo_b > prediccion.goles_equipo_a &&
-      resultado_partido.Resultado_Partido.goles_equipo_b >
-        resultado_partido.Resultado_Partido.goles_equipo_a) ||
+      resultado_partido.goles_equipo_b > resultado_partido.goles_equipo_a) ||
     (prediccion.goles_equipo_a === prediccion.goles_equipo_b &&
-      resultado_partido.Resultado_Partido.goles_equipo_a ===
-        resultado_partido.Resultado_Partido.goles_equipo_b)
+      resultado_partido.goles_equipo_a === resultado_partido.goles_equipo_b)
   ) {
     // Si predije ganar un equipo y ganó un equipo ó si predije empate y quedó empate
 
@@ -54,10 +51,8 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
   }
 
   if (
-    prediccion.goles_equipo_a ===
-      resultado_partido.Resultado_Partido.goles_equipo_a &&
-    prediccion.goles_equipo_b ===
-      resultado_partido.Resultado_Partido.goles_equipo_b
+    prediccion.goles_equipo_a === resultado_partido.goles_equipo_a &&
+    prediccion.goles_equipo_b === resultado_partido.goles_equipo_b
   ) {
     // Si acerté los goles de ambos equipos
 
@@ -70,8 +65,7 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
 
   if (
     prediccion.goles_equipo_a - prediccion.goles_equipo_b ===
-    resultado_partido.Resultado_Partido.goles_equipo_a -
-      resultado_partido.Resultado_Partido.goles_equipo_b
+    resultado_partido.goles_equipo_a - resultado_partido.goles_equipo_b
   ) {
     // Si acerté la diferencia de goles de ambos equipos
 
@@ -83,10 +77,10 @@ const calcularPuntos = async (prediccion, resultado_partido) => {
   }
 
   const resultado = {
-    usuario_id: prediccion.Empleado.empleado_id,
-    nombres: prediccion.Empleado.nombres.trim(),
-    apellidos: prediccion.Empleado.apellidos.trim(),
-    empresa: prediccion.Empleado.Empresa?.nombre || "",
+    usuario_id: prediccion.empleado_id,
+    nombres: prediccion.nombres.trim(),
+    apellidos: prediccion.apellidos.trim(),
+    empresa: prediccion.nombre_empresa || "",
     puntaje: puntos,
   };
 
