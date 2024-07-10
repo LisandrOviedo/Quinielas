@@ -3,20 +3,14 @@
  * @module "src/controllers/empleados_controllers.js"
  */
 
+const { QueryTypes } = require("sequelize");
+
 const axios = require("axios");
 
-const {
-  conn,
-  Empleado,
-  Roles,
-  Empresa,
-  Predicciones,
-  Partido,
-  Resultado_Partido,
-  Quiniela,
-} = require("../db");
+const { conn, conn2, Empleado, Roles, Empresa } = require("../db");
 
-const { API_EMPLEADOS } = process.env;
+const { API_EMPLEADOS, EMAIL, EMAIL_PASS, EMAIL_HOST, EMAIL_PORT } =
+  process.env;
 
 const { YYYYMMDD, fechaHoraActual } = require("../utils/formatearFecha");
 const {
@@ -36,7 +30,18 @@ const path = require("path");
 
 const PDFDocument = require("pdfkit-table");
 const fs = require("fs");
-const nodemailer = require("nodemailer");
+const nodeMailer = require("nodemailer");
+
+const transporter = nodeMailer.createTransport({
+  // @ts-ignore
+  host: EMAIL_HOST,
+  port: EMAIL_PORT,
+  secure: false,
+  auth: {
+    user: EMAIL,
+    pass: EMAIL_PASS,
+  },
+});
 
 /**
  * <b>Función para cargar los empleados desde la API</b>
@@ -290,51 +295,254 @@ const cargarEmpleadosExcel = async (
 
 /**
  * <b>Función para generar reporte de tabla de posiciones general de una base de datos</b>
+ * @param {*} conn Conexión de base de datos a utilizar
  * @param {boolean} ficticios true = Reporte con ficticios | false = Reporte sin ficticios
  * @param {number} limite Límite máximo de posiciones (0 = Sin límite)
+ * @param {Array<string>} correos Lista de direcciones de correos donde se enviará el reporte
  */
-const tablaPosicionesClaros = async (ficticios, limite) => {
-  try {
-    const resultado_partido = await Partido.findAll({
-      include: [
+const tablaPosicionesClaros = async (conn, ficticios, limite, correos) => {
+  if (
+    conn.config.database === "quiniela_db_claros" ||
+    conn.config.database === "quiniela_db_euro"
+  ) {
+    try {
+      const resultado_partido = await conn.query(
+        "SELECT * FROM partidos INNER JOIN resultado_partidos ON partidos.partido_id = resultado_partidos.partido_id",
         {
-          model: Resultado_Partido,
-          required: true,
-        },
-      ],
-    });
+          type: QueryTypes.SELECT,
+        }
+      );
+
+      if (resultado_partido) {
+        let resultados = [];
+
+        for (const resultado of resultado_partido) {
+          const predicciones = await conn.query(
+            `SELECT predicciones.*, empleados.empleado_id, empleados.cedula, empleados.nombres, empleados.apellidos, empleados.activo FROM predicciones INNER JOIN empleados ON predicciones.empleado_id = empleados.empleado_id WHERE predicciones.partido_id = ${resultado.partido_id}`,
+            {
+              type: QueryTypes.SELECT,
+            }
+          );
+
+          if (predicciones) {
+            for (const prediccion of predicciones) {
+              if (
+                (!ficticios &&
+                  // @ts-ignore
+                  prediccion.direccion === "04127777777") ||
+                prediccion.goles_equipo_a === null ||
+                prediccion.goles_equipo_b === null
+              ) {
+                continue;
+              }
+
+              await calcularPuntos(prediccion, resultado).then((objeto) => {
+                const index = resultados.findIndex(
+                  (empleado) => empleado.usuario_id === objeto.usuario_id
+                );
+
+                if (index !== -1) {
+                  // Actualizar el valor
+                  resultados[index].puntaje =
+                    resultados[index].puntaje + objeto.puntaje;
+                } else {
+                  // Agregar un nuevo objeto
+                  resultados.push(objeto);
+                }
+              });
+            }
+          } else {
+            console.log(
+              `${fechaHoraActual()} - No hay predicciones para el partido:`,
+              // @ts-ignore
+              resultado.partido_id
+            );
+          }
+        }
+
+        if (resultados.length) {
+          resultados.sort((a, b) => b.puntaje - a.puntaje);
+
+          const destPath = path.join(__dirname, `../../src/utils/reportes`);
+
+          crearCarpetaSiNoExiste(destPath);
+
+          // @ts-ignore
+          const doc = new PDFDocument({
+            bufferPages: true,
+            font: "Helvetica",
+          });
+
+          let nombre_quiniela = "";
+          let nombre_correo = "";
+
+          if (conn.config.database === "quiniela_db_claros") {
+            nombre_quiniela = `Tabla De Posiciones Quiniela Copa América 2024 (Los Claros)`;
+            nombre_correo = "Quiniela Copa América 2024 (Los Claros)";
+          } else if (conn.config.database === "quiniela_db_euro") {
+            nombre_quiniela = `Tabla De Posiciones Quiniela Eurocopa 2024 (Los Claros)`;
+            nombre_correo = "Quiniela Eurocopa 2024 (Los Claros)";
+          }
+
+          let nombre_reporte = "";
+
+          if (!ficticios) {
+            if (limite === 0) {
+              nombre_reporte = `${nombre_quiniela} (Sin Ficticios)`;
+            } else {
+              nombre_reporte = `${nombre_quiniela} (Sin Ficticios) (Primeros ${limite})`;
+            }
+          } else {
+            if (limite === 0) {
+              nombre_reporte = nombre_quiniela;
+            } else {
+              nombre_reporte = `${nombre_quiniela} (Primeros ${limite})`;
+            }
+          }
+
+          const pdf_path = path.join(
+            __dirname,
+            `../../src/utils/reportes/${nombre_reporte}.pdf`
+          );
+
+          doc.pipe(fs.createWriteStream(pdf_path));
+
+          doc
+            .fontSize(14)
+            .font("Helvetica-Bold")
+            .text(`${nombre_reporte}`, { align: "center" });
+          doc.moveDown();
+          doc.moveDown();
+
+          let posicion = 1;
+
+          (async function createTable() {
+            const table = {
+              headers: ["POSICIÓN", "NOMBRES", "APELLIDOS", "PUNTAJE"],
+              rows: [],
+            };
+            for (const resultado of resultados) {
+              if (posicion > limite && limite !== 0) {
+                break;
+              }
+
+              const row = [
+                posicion,
+                resultado.nombres,
+                resultado.apellidos,
+                resultado.puntaje,
+              ];
+
+              // @ts-ignore
+              table.rows.push(row);
+
+              posicion++;
+            }
+            await doc.table(table, {
+              columnsSize: [70, 170, 170, 60],
+              prepareHeader: () => doc.fontSize(11).font("Helvetica-Bold"),
+              prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
+                doc.fontSize(10).font("Helvetica");
+              },
+            });
+          })();
+
+          doc.on("end", () => {
+            const message = {
+              // @ts-ignore
+              from: `"${nombre_correo}" <gestiondeinformacion@grupo-lamar.com>`,
+              to: correos.join(", "),
+              subject: nombre_reporte,
+              text: nombre_reporte,
+              attachments: [
+                {
+                  filename: `${nombre_reporte}.pdf`,
+                  content: fs.createReadStream(pdf_path),
+                },
+              ],
+            };
+
+            transporter.sendMail(message, (error, info) => {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log(
+                  `${fechaHoraActual()} - Correo "${nombre_reporte}" enviado exitosamente!`
+                );
+              }
+            });
+          });
+
+          doc.end();
+
+          console.log(
+            `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
+          );
+        }
+      } else {
+        console.log(
+          `${fechaHoraActual()} - No hay resultados registrados de partidos`
+        );
+      }
+    } catch (error) {
+      throw new Error(`Error al crear el reporte: ${error.message}`);
+    }
+  } else {
+    return console.log(
+      `${fechaHoraActual()} - Esa conexión a base de datos no está en la lista de permitidas`
+    );
+  }
+};
+
+/**
+ * <b>Función para generar reporte de tabla de posiciones de una quiniela de la Copa América LAMAR</b>
+ * @param {number} quiniela_id ID de la quiniela a generar el reporte
+ * @param {number} limite Límite máximo de posiciones (0 = Sin límite)
+ * @param {Array<string>} correos Lista de direcciones de correos donde se enviará el reporte
+ */
+const tablaPosicionesLAMAR = async (quiniela_id, limite, correos) => {
+  if (!quiniela_id) {
+    return console.log(`${fechaHoraActual()} - Debes ingresar el quiniela_id`);
+  }
+
+  const quiniela = await conn2.query(
+    `SELECT * FROM quinielas WHERE quiniela_id = ${quiniela_id}`,
+    {
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  if (!quiniela) {
+    return console.log(`${fechaHoraActual()} - No existe esa quiniela`);
+  }
+
+  try {
+    const resultado_partido = await conn2.query(
+      "SELECT * FROM partidos INNER JOIN resultado_partidos ON partidos.partido_id = resultado_partidos.partido_id",
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
 
     if (resultado_partido) {
       let resultados = [];
 
       for (const resultado of resultado_partido) {
-        let predicciones = await Predicciones.findAll({
-          where: {
-            // @ts-ignore
-            partido_id: resultado.partido_id,
-          },
-          include: [
-            {
-              model: Empleado,
-              attributes: [
-                "empleado_id",
-                "cedula",
-                "nombres",
-                "apellidos",
-                "direccion",
-                "codigo_empleado",
-                "activo",
-              ],
-            },
-          ],
-        });
+        const predicciones = await conn2.query(
+          // @ts-ignore
+          `SELECT predicciones.*, empleados.empleado_id, empleados.cedula, empleados.nombres, empleados.apellidos, empleados.activo, empresas.quiniela_id, empresas.nombre as nombre_empresa FROM predicciones INNER JOIN empleados ON predicciones.empleado_id = empleados.empleado_id JOIN empresas ON empleados.empresa_id = empresas.empresa_id WHERE predicciones.partido_id = ${resultado.partido_id} AND empresas.quiniela_id = ${quiniela_id}`,
+          {
+            type: QueryTypes.SELECT,
+          }
+        );
 
         if (predicciones) {
           for (const prediccion of predicciones) {
             if (
-              !ficticios &&
               // @ts-ignore
-              prediccion.Empleado.direccion === "04127777777"
+              prediccion.goles_equipo_a === null ||
+              // @ts-ignore
+              prediccion.goles_equipo_b === null
             ) {
               continue;
             }
@@ -378,18 +586,12 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
 
         let nombre_reporte = "";
 
-        if (!ficticios) {
-          if (limite === 0) {
-            nombre_reporte = "Tabla Posiciones Claros (Sin Ficticios)";
-          } else {
-            nombre_reporte = `Tabla Posiciones Claros (Sin Ficticios) (Primeros ${limite})`;
-          }
+        if (limite === 0) {
+          // @ts-ignore
+          nombre_reporte = `Tabla De Posiciones Quiniela Copa América 2024 (${quiniela[0].nombre})`;
         } else {
-          if (limite === 0) {
-            nombre_reporte = "Tabla Posiciones Claros";
-          } else {
-            nombre_reporte = `Tabla Posiciones Claros (Primeros ${limite})`;
-          }
+          // @ts-ignore
+          nombre_reporte = `Tabla De Posiciones Quiniela Copa América 2024 (${quiniela[0].nombre}) (Primeros ${limite})`;
         }
 
         const pdf_path = path.join(
@@ -410,7 +612,7 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
 
         (async function createTable() {
           const table = {
-            headers: ["POSICIÓN", "NOMBRES", "APELLIDOS", "PUNTAJE"],
+            headers: ["POSICIÓN", "NOMBRES", "APELLIDOS", "EMPRESA", "PUNTAJE"],
             rows: [],
           };
           for (const resultado of resultados) {
@@ -422,6 +624,7 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
               posicion,
               resultado.nombres,
               resultado.apellidos,
+              resultado.empresa,
               resultado.puntaje,
             ];
 
@@ -431,13 +634,39 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
             posicion++;
           }
           await doc.table(table, {
-            columnsSize: [70, 170, 170, 60],
+            columnsSize: [60, 110, 110, 130, 60],
             prepareHeader: () => doc.fontSize(11).font("Helvetica-Bold"),
             prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
               doc.fontSize(10).font("Helvetica");
             },
           });
         })();
+
+        doc.on("end", () => {
+          const message = {
+            // @ts-ignore
+            from: `"Quiniela Copa América 2024 (${quiniela[0].nombre})" <gestiondeinformacion@grupo-lamar.com>`,
+            to: correos.join(", "),
+            subject: nombre_reporte,
+            text: nombre_reporte,
+            attachments: [
+              {
+                filename: `${nombre_reporte}.pdf`,
+                content: fs.createReadStream(pdf_path),
+              },
+            ],
+          };
+
+          transporter.sendMail(message, (error, info) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log(
+                `${fechaHoraActual()} - Correo "${nombre_reporte}" enviado exitosamente!`
+              );
+            }
+          });
+        });
 
         doc.end();
 
@@ -452,220 +681,6 @@ const tablaPosicionesClaros = async (ficticios, limite) => {
     }
   } catch (error) {
     throw new Error(`Error al crear el reporte: ${error.message}`);
-  }
-};
-
-/**
- * <b>Función para generar reporte de tabla de posiciones de una quiniela de la Copa América LAMAR</b>
- * @param {number} quiniela_id ID de la quiniela a generar el reporte
- * @param {number} limite Límite máximo de posiciones (0 = Sin límite)
- */
-const tablaPosicionesLAMAR = async (quiniela_id, limite) => {
-  if (!quiniela_id) {
-    return console.log(`${fechaHoraActual()} - Debes ingresar el quiniela_id`);
-  }
-
-  const quiniela = await Quiniela.findOne({
-    where: {
-      quiniela_id: quiniela_id,
-    },
-  });
-
-  if (!quiniela) {
-    return console.log(`${fechaHoraActual()} - No existe esa quiniela`);
-  }
-
-  try {
-    const resultado_partido = await Partido.findAll({
-      include: [
-        {
-          model: Resultado_Partido,
-          required: true,
-        },
-      ],
-    });
-
-    if (resultado_partido) {
-      let resultados = [];
-
-      for (const resultado of resultado_partido) {
-        let predicciones = await Predicciones.findAll({
-          where: {
-            // @ts-ignore
-            partido_id: resultado.partido_id,
-          },
-          include: [
-            {
-              model: Empleado,
-              attributes: [
-                "empleado_id",
-                "empresa_id",
-                "cedula",
-                "nombres",
-                "apellidos",
-                "direccion",
-                "codigo_empleado",
-                "activo",
-              ],
-              include: [
-                {
-                  model: Empresa,
-                  attributes: ["empresa_id", "quiniela_id", "nombre"],
-                  where: { quiniela_id: quiniela_id },
-                  required: true,
-                },
-              ],
-              required: true,
-            },
-          ],
-        });
-
-        if (predicciones) {
-          for (const prediccion of predicciones) {
-            await calcularPuntos(prediccion, resultado).then((objeto) => {
-              const index = resultados.findIndex(
-                (empleado) => empleado.usuario_id === objeto.usuario_id
-              );
-
-              if (index !== -1) {
-                // Actualizar el valor
-                resultados[index].puntaje =
-                  resultados[index].puntaje + objeto.puntaje;
-              } else {
-                // Agregar un nuevo objeto
-                resultados.push(objeto);
-              }
-            });
-          }
-        } else {
-          console.log(
-            `${fechaHoraActual()} - No hay predicciones para el partido:`,
-            // @ts-ignore
-            resultado.partido_id
-          );
-        }
-      }
-
-      if (resultados.length) {
-        resultados.sort((a, b) => b.puntaje - a.puntaje);
-
-        const destPath = path.join(__dirname, `../../src/utils/reportes`);
-
-        crearCarpetaSiNoExiste(destPath);
-
-        // @ts-ignore
-        const doc = new PDFDocument({
-          bufferPages: true,
-          font: "Helvetica",
-        });
-
-        let nombre_reporte = "";
-
-        if (limite === 0) {
-          // @ts-ignore
-          nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre})`;
-        } else {
-          // @ts-ignore
-          nombre_reporte = `Tabla Posiciones LAMAR (${quiniela.nombre}) (Primeros ${limite})`;
-        }
-
-        const pdf_path = path.join(
-          __dirname,
-          `../../src/utils/reportes/${nombre_reporte}.pdf`
-        );
-
-        doc.pipe(fs.createWriteStream(pdf_path));
-
-        doc
-          .fontSize(14)
-          .font("Helvetica-Bold")
-          .text(`${nombre_reporte}`, { align: "center" });
-        doc.moveDown();
-        doc.moveDown();
-
-        let posicion = 1;
-
-        (async function createTable() {
-          const table = {
-            headers: ["POSICIÓN", "NOMBRES", "APELLIDOS", "PUNTAJE"],
-            rows: [],
-          };
-          for (const resultado of resultados) {
-            if (posicion > limite && limite !== 0) {
-              break;
-            }
-
-            const row = [
-              posicion,
-              resultado.nombres,
-              resultado.apellidos,
-              resultado.puntaje,
-            ];
-
-            // @ts-ignore
-            table.rows.push(row);
-
-            posicion++;
-          }
-          await doc.table(table, {
-            columnsSize: [70, 170, 170, 60],
-            prepareHeader: () => doc.fontSize(11).font("Helvetica-Bold"),
-            prepareRow: (row, indexColumn, indexRow, rectRow, rectCell) => {
-              doc.fontSize(10).font("Helvetica");
-            },
-          });
-        })();
-
-        doc.end();
-
-        // const transporter = nodemailer.createTransport({
-        //   // @ts-ignore
-        //   host: "smtp.gmail.com",
-        //   port: 587,
-        //   secure: false,
-        //   auth: {
-        //     user: "lisandrotv24@gmail.com",
-        //     pass: 26388249,
-        //   },
-        // });
-
-        // const pdfFileContent = fs.readFileSync(pdf_path);
-
-        // if (pdfFileContent) {
-        //   const message = {
-        //     from: "lisandrotv24@gmail.com",
-        //     to: "lisandrotv24@gmail.com",
-        //     subject: nombre_reporte,
-        //     text: nombre_reporte,
-        //     attachments: [
-        //       {
-        //         filename: `${nombre_reporte}.pdf`,
-        //         content: pdfFileContent,
-        //         contentType: "application/pdf",
-        //       },
-        //     ],
-        //   };
-
-        //   transporter.sendMail(message, (error, info) => {
-        //     if (error) {
-        //       console.log(error);
-        //     } else {
-        //       console.log("Correo enviado: " + info.response);
-        //     }
-        //   });
-        // }
-
-        console.log(
-          `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
-        );
-      }
-    } else {
-      console.log(
-        `${fechaHoraActual()} - No hay resultados registrados de partidos`
-      );
-    }
-  } catch (error) {
-    throw new Error(`Error al crear el reporte excel: ${error.message}`);
   }
 };
 
