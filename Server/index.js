@@ -58,13 +58,13 @@ conn
       // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
 
       // await tablaPosicionesClaros(conn3, true, 0, [
-      // "rlaguna@grupo-lamar.com",
-      // "aseco@grupo-lamar.com",
+      //   "rlaguna@grupo-lamar.com",
+      //   "aseco@grupo-lamar.com",
       // ]);
 
       // await tablaPosicionesClaros(conn4, true, 0, [
-      // "rlaguna@grupo-lamar.com",
-      // "aseco@grupo-lamar.com",
+      //   "rlaguna@grupo-lamar.com",
+      //   "aseco@grupo-lamar.com",
       // ]);
 
       // await tablaPosicionesLAMAR(5, 0, [
