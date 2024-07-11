@@ -64,7 +64,7 @@ conn
         //
         // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
         //
-        // if (hora_actual === 9) {
+        // if (hora_actual === 22) {
         //   await tablaPosicionesClaros(conn3, true, 0, [
         //     "rlaguna@grupo-lamar.com",
         //     "aseco@grupo-lamar.com",
