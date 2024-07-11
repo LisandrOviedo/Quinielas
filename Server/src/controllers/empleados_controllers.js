@@ -448,36 +448,40 @@ const tablaPosicionesClaros = async (conn, ficticios, limite, correos) => {
           })();
 
           doc.on("end", () => {
-            const message = {
-              // @ts-ignore
-              from: `"${nombre_correo}" <gestiondeinformacion@grupo-lamar.com>`,
-              to: correos.join(", "),
-              subject: nombre_reporte,
-              text: nombre_reporte,
-              attachments: [
-                {
-                  filename: `${nombre_reporte}.pdf`,
-                  content: fs.createReadStream(pdf_path),
-                },
-              ],
-            };
-
-            transporter.sendMail(message, (error, info) => {
-              if (error) {
-                console.log(error);
-              } else {
-                console.log(
-                  `${fechaHoraActual()} - Correo "${nombre_reporte}" enviado exitosamente!`
-                );
-              }
-            });
+            console.log(
+              `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
+            );
           });
 
           doc.end();
 
-          console.log(
-            `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
-          );
+          const enviarCorreo = async () => {
+            try {
+              const message = {
+                // @ts-ignore
+                from: `"${nombre_correo}" <gestiondeinformacion@grupo-lamar.com>`,
+                to: correos.join(", "),
+                subject: nombre_reporte,
+                text: nombre_reporte,
+                attachments: [
+                  {
+                    filename: `${nombre_reporte}.pdf`,
+                    content: fs.createReadStream(pdf_path),
+                  },
+                ],
+              };
+
+              await transporter.sendMail(message);
+
+              console.log(
+                `${fechaHoraActual()} - Correo "${nombre_reporte}" enviado exitosamente!`
+              );
+            } catch (error) {
+              console.error(error);
+            }
+          };
+
+          await enviarCorreo();
         }
       } else {
         console.log(
@@ -643,6 +647,14 @@ const tablaPosicionesLAMAR = async (quiniela_id, limite, correos) => {
         })();
 
         doc.on("end", () => {
+          console.log(
+            `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
+          );
+        });
+
+        doc.end();
+
+        const enviarCorreo = async () => {
           const message = {
             // @ts-ignore
             from: `"Quiniela Copa América 2024 (${quiniela[0].nombre})" <gestiondeinformacion@grupo-lamar.com>`,
@@ -657,22 +669,14 @@ const tablaPosicionesLAMAR = async (quiniela_id, limite, correos) => {
             ],
           };
 
-          transporter.sendMail(message, (error, info) => {
-            if (error) {
-              console.log(error);
-            } else {
-              console.log(
-                `${fechaHoraActual()} - Correo "${nombre_reporte}" enviado exitosamente!`
-              );
-            }
-          });
-        });
+          await transporter.sendMail(message);
 
-        doc.end();
+          console.log(
+            `${fechaHoraActual()} - Correo "${nombre_reporte}" enviado exitosamente!`
+          );
+        };
 
-        console.log(
-          `${fechaHoraActual()} - Reporte: "${nombre_reporte}" creado exitosamente!`
-        );
+        await enviarCorreo();
       }
     } else {
       console.log(
