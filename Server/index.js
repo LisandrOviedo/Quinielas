@@ -43,44 +43,56 @@ conn
     server.listen(PORT, async () => {
       console.log(`${fechaHoraActual()} - Server listening on port ${PORT}`);
 
-      // await cargarRoles();
+      // const hora_actual = new Date().getHours();
 
-      // await cargarQuinielas();
-      // await cargarEmpresas();
-      // await cargarEmpleados();
-
-      // await cargarEmpleadosFaltantes();
-
-      // await cargarEquipos();
-      // await cargarTorneos();
-      // await cargarPartidos();
-
-      // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
-
-      // await tablaPosicionesClaros(conn3, true, 0, [
-      //   "rlaguna@grupo-lamar.com",
-      //   "aseco@grupo-lamar.com",
-      // ]);
-
-      // await tablaPosicionesClaros(conn4, true, 0, [
-      //   "rlaguna@grupo-lamar.com",
-      //   "aseco@grupo-lamar.com",
-      // ]);
-
-      // await tablaPosicionesLAMAR(5, 0, [
-      //   "rlaguna@grupo-lamar.com",
-      //   "aseco@grupo-lamar.com",
-      // ]);
-
-      // await prediccionesFaltantes(24, "Fase de grupos");
-
-      // await cerrarPartidos().then(() => {
-      //   console.log(
-      //     `${fechaHoraActual()} - Terminó el proceso de cerrar partidos`
-      //   );
-
-      //   process.exit(0);
-      // });
+      try {
+        // await cargarRoles();
+        //
+        // await cargarQuinielas();
+        //
+        // await cargarEmpresas();
+        //
+        // await cargarEmpleados();
+        //
+        // await cargarEmpleadosFaltantes();
+        //
+        // await cargarEquipos();
+        //
+        // await cargarTorneos();
+        //
+        // await cargarPartidos();
+        //
+        // await cargarEmpleadosExcel("Empleados-Aqualago.xlsx", 9, 80);
+        //
+        // if (hora_actual === 9) {
+        //   await tablaPosicionesClaros(conn3, true, 0, [
+        //     "rlaguna@grupo-lamar.com",
+        //     "aseco@grupo-lamar.com",
+        //   ]);
+        //
+        //   await tablaPosicionesClaros(conn4, true, 0, [
+        //     "rlaguna@grupo-lamar.com",
+        //     "aseco@grupo-lamar.com",
+        //   ]);
+        // }
+        //
+        // await tablaPosicionesLAMAR(5, 0, [
+        //   "rlaguna@grupo-lamar.com",
+        //   "aseco@grupo-lamar.com",
+        // ]);
+        //
+        // await prediccionesFaltantes(24, "Fase de grupos");
+        //
+        // await cerrarPartidos();
+      } catch (err) {
+        console.error("Error:", err);
+        process.exit(1); // Salir con código de error 1 en caso de error
+      } finally {
+        process.exit(0); // Salir con código de éxito 0 al final
+      }
     });
   })
-  .catch((error) => console.error(error));
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
