@@ -130,6 +130,8 @@ const cerrarPartidos = async () => {
 
       await cerrarPartido(partidos_activos3, conn4, bd);
     }
+
+    console.log(`${fechaHoraActual()} - Terminó el proceso de cerrar partidos`);
   } catch (error) {
     throw new Error(`Error al cerrar los partidos: ${error.message}`);
   }
