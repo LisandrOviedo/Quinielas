@@ -107,14 +107,14 @@ const {
 } = sequelize.models;
 
 // RELACIONES DE MODELOS (TABLAS)
-// Roles 1:1 Empleado
-Empleado.belongsTo(Roles, {
+// Roles 1:M Empleado
+Roles.hasMany(Empleado, {
   foreignKey: {
     allowNull: false,
     name: "rol_id",
   },
 });
-Roles.hasOne(Empleado, {
+Empleado.belongsTo(Roles, {
   foreignKey: {
     allowNull: false,
     name: "rol_id",
