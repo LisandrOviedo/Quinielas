@@ -66,19 +66,13 @@ conn
         //
         // if (hora_actual === 22) {
         //   await tablaPosicionesClaros(conn3, true, 0, [
-        //     "rlaguna@grupo-lamar.com",
-        //     "aseco@grupo-lamar.com",
         //   ]);
         //
         //   await tablaPosicionesClaros(conn4, true, 0, [
-        //     "rlaguna@grupo-lamar.com",
-        //     "aseco@grupo-lamar.com",
         //   ]);
         // }
         //
         // await tablaPosicionesLAMAR(5, 0, [
-        //   "rlaguna@grupo-lamar.com",
-        //   "aseco@grupo-lamar.com",
         // ]);
         //
         // await prediccionesFaltantes(24, "Fase de grupos");

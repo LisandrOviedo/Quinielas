@@ -459,7 +459,7 @@ const tablaPosicionesClaros = async (conn, ficticios, limite, correos) => {
             try {
               const message = {
                 // @ts-ignore
-                from: `"${nombre_correo}" <gestiondeinformacion@grupo-lamar.com>`,
+                from: `"${nombre_correo}" <.com>`,
                 to: correos.join(", "),
                 subject: nombre_reporte,
                 text: nombre_reporte,
@@ -657,7 +657,7 @@ const tablaPosicionesLAMAR = async (quiniela_id, limite, correos) => {
         const enviarCorreo = async () => {
           const message = {
             // @ts-ignore
-            from: `"Quiniela Copa América 2024 (${quiniela[0].nombre})" <gestiondeinformacion@grupo-lamar.com>`,
+            from: `"Quiniela Copa América 2024 (${quiniela[0].nombre})" <.com>`,
             to: correos.join(", "),
             subject: nombre_reporte,
             text: nombre_reporte,
